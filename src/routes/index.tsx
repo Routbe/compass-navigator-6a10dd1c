@@ -1,11 +1,10 @@
-import { pageCardImage } from "@/lib/page-cards";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 import { getGatewaySession } from "@/lib/gateway.functions";
 import Page from "@/components/imported-pages/Gateway";
 import { getRequestLocale } from "@/lib/locale.functions";
 import { resolveHostProfile } from "@/lib/domain-routing.functions";
-import { OG_IMAGE, canonicalLinks, socialMeta } from "@/lib/social-meta";
+import { canonicalLinks, socialMeta } from "@/lib/social-meta";
 import { getPublicProfileByHandle } from "@/lib/studio-profile.functions";
 import { fediverseHeadLinks, type FediverseIdentity } from "@/lib/fediverse-profile";
 import { profileSocialMeta } from "@/lib/social-meta";
@@ -25,7 +24,7 @@ export const Route = createFileRoute("/")({
     return { ...locale, hostHandle: host.handle, hostProfile };
   },
   head: ({ loaderData }) => ({
-    meta: loaderData?.hostProfile ? profileSocialMeta({ locale: loaderData.locale, handle: loaderData.hostHandle ?? "", displayName: loaderData.hostProfile["display_name"] as string | null, bio: loaderData.hostProfile["bio"] as string | null, avatarUrl: loaderData.hostProfile["avatar_url"] as string | null, url: "/" }) : socialMeta(loaderData?.locale ?? "en", pageCardImage("home", loaderData?.locale ?? "en")),
+    meta: loaderData?.hostProfile ? profileSocialMeta({ locale: loaderData.locale, handle: loaderData.hostHandle ?? "", displayName: loaderData.hostProfile["display_name"] as string | null, bio: loaderData.hostProfile["bio"] as string | null, avatarUrl: loaderData.hostProfile["avatar_url"] as string | null, url: "/" }) : socialMeta(loaderData?.locale ?? "en"),
     links: [...canonicalLinks("/"), ...fediverseHeadLinks(loaderData?.hostProfile?.["fediverse"] as FediverseIdentity | null)],
     // ROUT's knowledge graph (Organization, founder, ROUT OS) is rendered sitewide from __root.
   }),
