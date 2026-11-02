@@ -1,0 +1,13 @@
+{
+  "source": "https://github.com/Routbe/compass-navigator-73781e3c.git",
+  "method": "source archive import, not GitHub webpage capture",
+  "permission_confirmed": true,
+  "excluded": [
+    "repository metadata",
+    "source Lovable project identity",
+    "source generated integrations",
+    "generated route tree",
+    "dependency and build output"
+  ],
+  "verification": []
+}
