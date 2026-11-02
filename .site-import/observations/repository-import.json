@@ -9,5 +9,68 @@
     "generated route tree",
     "dependency and build output"
   ],
-  "verification": []
+  "verification": [
+    {
+      "layout": "desktop",
+      "control": "navigation",
+      "status": "passed",
+      "links": [
+        "/qr",
+        "/studio",
+        "/agenda",
+        "/batch",
+        "/dashboard/routes",
+        "/product/custom-domains",
+        "/console",
+        "/self-hosting"
+      ],
+      "screenshot": "desktop-menu.png"
+    },
+    {
+      "layout": "desktop",
+      "control": "claim identity",
+      "status": "destination passed; sign-in service blocked by missing backend configuration",
+      "destination": "http://localhost:8080/auth/sign-in"
+    },
+    {
+      "layout": "desktop",
+      "control": "command input",
+      "status": "passed",
+      "input": "/developers",
+      "destination": "http://localhost:8080/developers"
+    },
+    {
+      "layout": "phone",
+      "control": "navigation",
+      "status": "passed",
+      "links": [
+        "/qr",
+        "/studio",
+        "/agenda",
+        "/batch",
+        "/dashboard/routes",
+        "/product/custom-domains",
+        "/console",
+        "/self-hosting"
+      ],
+      "screenshot": "phone-menu.png"
+    },
+    {
+      "layout": "phone",
+      "control": "claim identity",
+      "status": "destination passed; sign-in service blocked by missing backend configuration",
+      "destination": "http://localhost:8080/auth/sign-in"
+    },
+    {
+      "layout": "phone",
+      "control": "command input",
+      "status": "passed",
+      "input": "/developers",
+      "destination": "http://localhost:8080/developers"
+    }
+  ],
+  "source_visual_comparison": "blocked: repository homepage redirects to Vercel login; no credentials entered",
+  "build": "passed",
+  "tests": "14 routing and command parser tests passed",
+  "remaining": "Original custom PostgreSQL/auth, storage, payments and email service configuration not migrated; authenticated flows unverified"
 }
