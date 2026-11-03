@@ -6,6 +6,7 @@ import { isProfileSectionKind, PROFILE_SECTION_LABELS } from "@/lib/profile-sect
 import { integrationById } from "@/lib/integrations-catalog";
 import { GuestbookAccordion } from "@/components/studio/GuestbookAccordion";
 import { QuestionsInboxAccordion } from "@/components/studio/QuestionsInboxAccordion";
+import { QaPageDesign } from "@/components/studio/QaPageDesign";
 import { StudioSectionIcon } from "@/components/studio/StudioSectionIcon";
 import { getMyTipSetup } from "@/lib/tip-page.functions";
 import {
@@ -170,7 +171,7 @@ type WorkspaceCanvas = { workspaceId: string; name: string; slug: string; role: 
  * Four fixed tabs (links, design, analytics, settings) with a live mobile
  * preview alongside, fully decoupled from the QR generator.
  */
-export function ProfileEditor({ variant = "verified", pageMode = "profile", onPagesChange, workspaceSlug }: { variant?: ProfileVariant; pageMode?: "profile" | "tip"; onPagesChange?: (pages: { tipEnabled: boolean; handle: string }) => void; workspaceSlug?: string } = {}) {
+export function ProfileEditor({ variant = "verified", pageMode = "profile", onPagesChange, workspaceSlug }: { variant?: ProfileVariant; pageMode?: "profile" | "tip" | "qa"; onPagesChange?: (pages: { tipEnabled: boolean; qaEnabled: boolean; handle: string }) => void; workspaceSlug?: string } = {}) {
   const { t } = useI18n();
   const { user } = useAuth();
   const { style: rawUrlStyle, save: saveUrlStylePref } = useUrlStyle();
@@ -491,7 +492,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
   const publicPath = isWorkspace
     ? workspacePublicPath(wsCanvas?.slug ?? workspaceSlug ?? "", wsDomain)
     : (live.path ?? styledProfilePath(claimed ?? "", urlStyle));
-  useEffect(() => { onPagesChange?.({ tipEnabled: !alias && verified && tipEnabled, handle: normalized }); }, [alias, verified, tipEnabled, normalized, onPagesChange]);
+  useEffect(() => { onPagesChange?.({ tipEnabled: !alias && verified && tipEnabled, qaEnabled: prefs.questionsEnabled && prefs.qaPage, handle: normalized }); }, [alias, verified, tipEnabled, prefs.questionsEnabled, prefs.qaPage, normalized, onPagesChange]);
 
   // De "Domains & Bluesky"-tab is verified-only voor personen; een workspace
   // krijgt hem altijd: domeinclaim (rout.be/<domein>) is háár verificatie.
@@ -630,18 +631,18 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
 
   // Opslaan één tegelijk; bij fout opnieuw proberen met oplopende pauze.
   useEffect(() => {
-    if (!dirty || saving || !handleOk) return;
+    if (!dirty || saving || discarding || publishing || !handleOk) return;
     const wait = saveError ? Math.min(30000, 2000 * 2 ** (failCount.current - 1)) : flushSoon.current ? 0 : 500;
     const id = setTimeout(() => { flushSoon.current = false; void save(true); }, wait);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dirty, draft, handleOk, saving, saveError, retryIn]);
+  }, [dirty, draft, handleOk, saving, discarding, publishing, saveError, retryIn]);
 
   // Direct opslaan bij tab-/paginawissel, verbergen van de pagina of verlaten van de Studio,
   // zodat een net toegevoegde video of link nooit verloren gaat.
   const flushRef = useRef<() => void>(() => {});
   flushRef.current = () => {
-    if (dirty && !saving && handleOk) void save(true);
+    if (dirty && !saving && !discarding && !publishing && handleOk) void save(true);
   };
   useEffect(() => { flushRef.current(); }, [tab, pageMode]);
   useEffect(() => {
@@ -690,9 +691,9 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
     let results: PatchResult[];
     try {
       const calls: Promise<PatchResult>[] = [];
-      if (patches.meta) calls.push(saveMeta({ data: { space, ...patches.meta } }));
-      if (patches.theme) calls.push(saveTheme({ data: { space, ...patches.theme } as never }));
-      if (patches.links) calls.push(saveLinks({ data: { space, blocks: patches.links.blocks as never } }));
+      if (patches.meta) calls.push(saveMeta({ data: { ...canvas, ...patches.meta } }));
+      if (patches.theme) calls.push(saveTheme({ data: { ...canvas, ...patches.theme } as never }));
+      if (patches.links) calls.push(saveLinks({ data: { ...canvas, blocks: patches.links.blocks as never } }));
       results = hasPatches(patches) ? await Promise.all(calls) : [];
     } catch (e) {
       failCount.current += 1;
@@ -802,6 +803,17 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
       return;
     }
     applyPayload(result.payload as Record<string, unknown>);
+    savedSnapshot.current = {
+      username: String(result.payload["username"] ?? ""),
+      displayName: result.payload["displayName"] as string | null,
+      tagline: result.payload["tagline"] as string | null,
+      avatarUrl: result.payload["avatarUrl"] as string | null,
+      faviconUrl: result.payload["faviconUrl"] as string | null,
+      theme: String(result.payload["theme"] ?? "noir"),
+      cardStyle: String(result.payload["cardStyle"] ?? "bordered"),
+      prefs: parseDisplayPrefs(result.payload["displayPrefs"]) as unknown as Record<string, unknown>,
+      blocks: Array.isArray(result.payload["blocks"]) ? result.payload["blocks"] : [],
+    };
     setDraftRevision(result.meta.draftRevision);
     setPublishedRevision(result.meta.publishedRevision);
     setDirty(false);
@@ -1088,7 +1100,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
         </div>
       </div>
 
-      {editMode === "tip" && !alias && verified ? (
+      {editMode === "qa" ? <QaPageDesign prefs={prefs} setPref={setPref} handle={normalized} avatarUrl={avatarUrl} theme={theme} /> : editMode === "tip" && !alias && verified ? (
         <div className="mt-4 grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
           <div className="min-w-0 space-y-6 lg:col-span-7">
             <TipPagePanel onEnabledChange={setTipEnabled} />
@@ -1173,6 +1185,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                 onWidget={(id) => {
                   if (id === "questions") {
                     setPref("questionsEnabled", true);
+                    setPref("qaOnHub", true);
                     toast.success(t("studio.editor.questionsOn"));
                   } else if (id === "badges") {
                     setPref("badgeShowcaseVisible", true);

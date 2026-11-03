@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ProfileEditor, type ProfileVariant } from "@/components/dashboard/ProfileEditor";
-import { BadgeCheck, Lock, Sparkles, HeartHandshake, ChevronDown, Check, CalendarClock } from "lucide-react";
+import { BadgeCheck, Lock, Sparkles, HeartHandshake, ChevronDown, Check, CalendarClock, MessageCircleQuestion } from "lucide-react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useAuth } from "@/hooks/useAuth";
 import { useUrlStyle } from "@/hooks/useUrlStyle";
@@ -19,7 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { IdentityVerification } from "@/components/settings/IdentityVerification";
 import { BookingStudioPanel } from "@/components/imported-pages/BookingStudio";
 
-type PageMode = "profile" | "tip" | "booking";
+type PageMode = "profile" | "tip" | "booking" | "qa";
 
 /** /studio — the dedicated Profile Hub (link-in-bio) workspace. */
 export default function Studio() {
@@ -52,8 +52,8 @@ export default function Studio() {
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("page") === "booking") setPageMode("booking");
   }, []);
-  const [pages, setPages] = useState({ tipEnabled: false, handle: "" });
-  const updatePages = useCallback((next: { tipEnabled: boolean; handle: string }) => setPages(next), []);
+  const [pages, setPages] = useState({ tipEnabled: false, qaEnabled: false, handle: "" });
+  const updatePages = useCallback((next: { tipEnabled: boolean; qaEnabled: boolean; handle: string }) => setPages(next), []);
   const fetchState = useServerFn(getVerificationState);
   const state = useQuery({
     queryKey: ["verification-state", user?.id],
@@ -86,9 +86,9 @@ export default function Studio() {
   ];
   const tabUrl = (id: ProfileVariant) => (pages.handle ? `rout.be${id === "alias" ? `/u/${pages.handle}` : verifiedPath(pages.handle)}` : null);
 
-  const modeIcon = (m: PageMode, Fallback: typeof Sparkles) => m === "tip" ? HeartHandshake : m === "booking" ? CalendarClock : Fallback;
-  const modeLabel = (m: PageMode, fallback: string) => m === "tip" ? t("studio.mode.tip") : m === "booking" ? t("studio.nav.booking") : fallback;
-  const modeSuffix = (m: PageMode) => m === "tip" ? "/tip" : m === "booking" ? "/booking" : "";
+  const modeIcon = (m: PageMode, Fallback: typeof Sparkles) => m === "qa" ? MessageCircleQuestion : m === "tip" ? HeartHandshake : m === "booking" ? CalendarClock : Fallback;
+  const modeLabel = (m: PageMode, fallback: string) => m === "qa" ? "Anonieme vragen" : m === "tip" ? t("studio.mode.tip") : m === "booking" ? t("studio.nav.booking") : fallback;
+  const modeSuffix = (m: PageMode) => m === "qa" ? "/ask" : m === "tip" ? "/tip" : m === "booking" ? "/booking" : "";
 
   return (
     <AppLayout
@@ -116,11 +116,11 @@ export default function Studio() {
                 <span className="min-w-0 flex-1"><span className="block text-sm font-medium">{label}</span><span className="hidden break-all font-mono text-xs opacity-70 md:block">{selected ? tabUrl(id) ?? hint : hint}</span></span>
                 {locked && <Lock className="size-3.5 shrink-0" aria-label={t("studio.common.locked")} />}
               </Button>;
-              if (!selected || id !== "verified" || locked) return <div key={id} className="flex min-w-0 flex-1">{trigger}</div>;
+              if (!selected || locked || (id !== "verified" && !pages.qaEnabled)) return <div key={id} className="flex min-w-0 flex-1">{trigger}</div>;
               return <DropdownMenu key={id}><DropdownMenuTrigger asChild><Button variant="ghost" role="tab" aria-selected aria-label={t("studio.mode.pages")} className="h-9 min-w-0 flex-1 md:h-auto md:min-h-12 justify-start gap-2 whitespace-normal rounded-lg bg-foreground px-3 py-2 text-left text-background hover:bg-foreground hover:text-background">
                 {(() => { const M = modeIcon(pageMode, Icon); return <M className="size-4 shrink-0" />; })()}<span className="min-w-0 flex-1"><span className="block text-sm font-medium">{modeLabel(pageMode, label)}</span><span className="hidden break-all font-mono text-xs opacity-70 md:block">{tabUrl(id) ?? hint}{modeSuffix(pageMode)}</span></span><ChevronDown className="size-4 shrink-0" />
               </Button></DropdownMenuTrigger><DropdownMenuContent align="start" className="w-72 max-w-[calc(100vw-24px)]">
-                {(["profile", "tip", "booking"] as const).filter(mode => mode !== "tip" || pages.tipEnabled).map(mode => { const M = modeIcon(mode, BadgeCheck); return <DropdownMenuItem key={mode} onSelect={() => setPageMode(mode)}><M className="size-4" /><span className="flex-1">{modeLabel(mode, t("studio.mode.profile"))}</span>{pageMode === mode && <Check className="size-4" />}</DropdownMenuItem>; })}
+                {(["profile", "tip", "booking", "qa"] as const).filter(mode => (mode !== "tip" || pages.tipEnabled) && (mode !== "qa" || pages.qaEnabled) && (mode !== "booking" || id === "verified")).map(mode => { const M = modeIcon(mode, BadgeCheck); return <DropdownMenuItem key={mode} onSelect={() => setPageMode(mode)}><M className="size-4" /><span className="flex-1">{modeLabel(mode, t("studio.mode.profile"))}</span>{pageMode === mode && <Check className="size-4" />}</DropdownMenuItem>; })}
               </DropdownMenuContent></DropdownMenu>;
             })}
           </div>
