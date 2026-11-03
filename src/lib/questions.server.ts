@@ -57,7 +57,7 @@ function toPublic(raw: unknown): QaPublic | null {
     audience: o["audience"] === "public_unrestricted" || o["audience"] === "verified_only" ? o["audience"] : "members_only",
     showAvatar: o["showAvatar"] !== false,
     showProfileLink: o["showProfileLink"] !== false,
-    displayPrefs: o["design"] && typeof o["design"] === "object" ? o["design"] as Record<string, unknown> : {},
+    designJson: o["design"] && typeof o["design"] === "object" ? JSON.stringify(o["design"]) : null,
     answers: answers.map((a) => ({
       id: String(a["id"]),
       body: String(a["body"] ?? ""),

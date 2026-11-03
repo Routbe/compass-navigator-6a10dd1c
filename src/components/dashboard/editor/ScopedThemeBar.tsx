@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,8 @@ const SCOPES: { id: ThemeScope; label: string }[] = [
   { id: "board", label: "💬 Prikbord" },
   { id: "presence", label: "🎵 Live-status" },
   { id: "socials", label: "📱 Socials" },
+  { id: "questions", label: "Anonieme vragen" },
+  { id: "answers", label: "Q&A-antwoorden" },
 ];
 
 const STYLES: { id: GlassStyle; label: string; hint: string }[] = [
@@ -57,8 +60,12 @@ const TARGETS: { id: keyof GlassTargets; label: string }[] = [
 ];
 
 /** Scoped theme bar + glass controls under "Knoppen & Typografie". */
-export function ScopedThemeBar({ prefs, setPref }: { prefs: ProfileDisplayPrefs; setPref: SetPref }) {
-  const [scope, setScope] = useState<ThemeScope>("all");
+export function ThemeScopeSelect({ scope, onChange }: { scope: ThemeScope; onChange: (s: ThemeScope) => void }) {
+  return <Select value={scope} onValueChange={(v) => onChange(v as ThemeScope)}><SelectTrigger aria-label="Stijl toepassen op" className="h-8 w-40 text-xs"><SelectValue /></SelectTrigger><SelectContent>{SCOPES.map((s) => <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>)}</SelectContent></Select>;
+}
+
+export function ScopedThemeBar({ prefs, setPref, scope = "all" }: { prefs: ProfileDisplayPrefs; setPref: SetPref; scope?: ThemeScope }) {
+  const [custom, setCustom] = useState(false);
   const tokens = resolveScopedTokens(prefs, prefs.themeOverrides, scope);
   const unique = hasUniqueStyle(prefs, prefs.themeOverrides, scope);
 
@@ -67,7 +74,8 @@ export function ScopedThemeBar({ prefs, setPref }: { prefs: ProfileDisplayPrefs;
     const next = applyScopedPatch(prefs, prefs.themeOverrides, scope, p);
     if (scope === "all") {
       (Object.keys(p) as (keyof ScopeOverride)[]).forEach((k) => setPref(k, (next.global as Record<string, unknown>)[k] as never));
-      if (Object.keys(p).some((k) => k.startsWith("button") || k === "fontPairing")) setPref("buttonsCustom", true);
+      if (Object.keys(p).some((k) => k.startsWith("button"))) setPref("buttonsCustom", true);
+      if ("fontPairing" in p) setPref("typographyCustom", true);
     } else {
       setPref("themeOverrides", next.overrides);
     }
@@ -79,7 +87,6 @@ export function ScopedThemeBar({ prefs, setPref }: { prefs: ProfileDisplayPrefs;
   return (
     <section className="space-y-4 border-t border-border pt-4">
       <div className="flex items-center justify-between gap-2">
-        <p className="input-label">Stijl toepassen op</p>
         {unique && scope !== "all" ? (
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-primary">● Unieke stijl</span>
@@ -91,25 +98,7 @@ export function ScopedThemeBar({ prefs, setPref }: { prefs: ProfileDisplayPrefs;
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">Volgt standaard</span>
         ) : null}
       </div>
-      <div role="tablist" aria-label="Doelonderdeel" className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none]">
-        {SCOPES.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            role="tab"
-            aria-selected={scope === s.id}
-            onClick={() => setScope(s.id)}
-            className={cn(
-              "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-              scope === s.id ? "border-foreground bg-foreground text-background" : "border-border hover:bg-muted",
-            )}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      <ButtonControls design={design} patch={patch} />
+      <ButtonControls design={design} patch={patch} custom={custom} onCustomize={() => setCustom((v) => !v)} />
 
       <p className="input-label">Glaseffect</p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -211,16 +200,20 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 function ButtonControls({
   design,
   patch,
+  custom,
+  onCustomize,
 }: {
   design: { buttonVariant: string; buttonRadius: string; fontPairing: string; buttonColor: string | null; buttonTextColor: string | null };
   patch: (p: ScopeOverride) => void;
+  custom: boolean;
+  onCustomize: () => void;
 }) {
   const variants = BUTTON_VARIANTS.filter((v) => (OVERRIDE_BUTTON_VARIANTS as readonly string[]).includes(v.id));
   const radii = BUTTON_RADII.filter((r) => (OVERRIDE_BUTTON_RADII as readonly string[]).includes(r.id));
   return (
     <div className="space-y-3">
       <div className="space-y-2">
-        <p className="input-label">Knopvorm</p>
+        <div className="flex items-center gap-2"><p className="input-label">Knopvorm</p><Button variant="ghost" size="sm" onClick={onCustomize} aria-expanded={custom}>Aanpassen</Button></div>
         <div className="flex flex-wrap gap-1.5">
           {BUTTON_SHAPE_PRESETS.map((sp) => (
             <Chip
@@ -233,7 +226,7 @@ function ButtonControls({
           ))}
         </div>
       </div>
-      <div className="space-y-2">
+      {custom && <div className="space-y-2">
         <p className="input-label">Knopstijl</p>
         <div className="flex flex-wrap gap-1.5">
           {variants.map((v) => (
@@ -242,7 +235,7 @@ function ButtonControls({
             </Chip>
           ))}
         </div>
-      </div>
+      </div>}
       <div className="space-y-2">
         <p className="input-label">Typografie</p>
         <div className="flex flex-wrap gap-1.5">

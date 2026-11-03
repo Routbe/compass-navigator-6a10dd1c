@@ -8,6 +8,7 @@ import { QaAskForm } from "./QaAskForm";
 import { QaStoryRing } from "./QaStoryRing";
 import { qaPaths, useQaPublic, type QaSpace } from "./useQaPublic";
 import type { QaPublic } from "@/lib/qa/types";
+import { qaDesign } from "@/lib/qa/design";
 
 /** Full-screen, distraction-free anonymous message page (/u/<handle>/ask, /<handle>/ask). */
 export function QaAskPage({ handle, space, initial }: { handle: string; space: QaSpace; initial: QaPublic | null }) {
@@ -30,6 +31,9 @@ export function QaAskPage({ handle, space, initial }: { handle: string; space: Q
   const name = qa.displayName || `@${handle}`;
   const avatar = profileImageSrc(qa.avatarUrl);
   const headline = promptHeadline(qa.promptKey, qa.promptCustom, t);
+  let design: unknown = {};
+  try { design = qa.designJson ? JSON.parse(qa.designJson) : {}; } catch { /* use default design */ }
+  const surface = { card: "var(--card)", border: "var(--border)", text: "var(--foreground)", muted: "var(--muted-foreground)" };
 
   return (
     <main
@@ -38,27 +42,27 @@ export function QaAskPage({ handle, space, initial }: { handle: string; space: Q
     >
       <div className="mx-auto flex w-full max-w-md flex-col px-5">
         <header className="flex items-center justify-between py-2">
-          <a href={paths.profile} className="inline-flex min-h-10 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          {qa.showProfileLink && <a href={paths.profile} className="inline-flex min-h-10 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" aria-hidden /> {t("pages.qa.ask.back")}
-          </a>
+          </a>}
           <RoutLogo size={22} showWordmark={false} />
         </header>
 
         <div className="mt-6 flex flex-col items-center text-center">
-          <QaStoryRing handle={handle} space={space} displayName={qa.displayName} avatarUrl={qa.avatarUrl}>
+          {qa.showAvatar && <QaStoryRing handle={handle} space={space} displayName={qa.displayName} avatarUrl={qa.avatarUrl}>
             {avatar ? (
               <img src={avatar} alt={name} className="h-24 w-24 rounded-full object-cover" />
             ) : (
               <span className="flex h-24 w-24 items-center justify-center rounded-full bg-card text-3xl font-semibold">{name.replace(/^@/, "").slice(0, 1).toUpperCase()}</span>
             )}
-          </QaStoryRing>
+          </QaStoryRing>}
           <h1 className="mt-3 text-lg font-semibold">{name}</h1>
           <p className="text-xs text-muted-foreground">@{handle}</p>
         </div>
 
         <section className="mt-6">
           {qa.accepting ? (
-            <QaAskForm handle={handle} space={space} headline={headline} />
+            <QaAskForm handle={handle} space={space} headline={headline} designStyle={qaDesign(design, "questions", surface)} />
           ) : (
             <p role="status" className="rounded-3xl border border-border bg-card p-5 text-sm text-muted-foreground">{t("pages.qa.ask.closed")}</p>
           )}
@@ -75,7 +79,7 @@ export function QaAskPage({ handle, space, initial }: { handle: string; space: Q
           ) : (
             <ul className="mt-3 space-y-3">
               {qa.answers.map((a) => (
-                <li key={a.id} className="overflow-hidden rounded-2xl border border-border bg-card">
+                <li key={a.id} className="overflow-hidden rounded-2xl border border-border bg-card" style={qaDesign(design, "answers", surface)}>
                   <div className="bg-gradient-to-br from-story-ring/25 to-story-ring-2/10 px-4 py-3">
                     {a.prompt && <p className="text-[11px] text-muted-foreground">{storedPromptLabel(a.prompt, t)}</p>}
                     <p className="break-words font-medium">{a.body}</p>

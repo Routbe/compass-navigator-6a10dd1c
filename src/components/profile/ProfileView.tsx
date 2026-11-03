@@ -480,7 +480,7 @@ export function ProfileView({
         <ProfilePassport handle={profile.username} theme={t} />
         {profile.username && <ConnectedApps handle={profile.username} />}
         {profile.username && prefs.guestbookEnabled && usesSectionFallback(profile.blocks, "widget:guestbook") && <ProfileGuestbook handle={profile.username} theme={t} />}
-        {profile.username && qaSpace && prefs.questionsEnabled && prefs.qaOnHub && <ProfileQuestions handle={profile.username} space={qaSpace} theme={t} />}
+        {profile.username && qaSpace && prefs.questionsEnabled && prefs.qaOnHub && <ProfileQuestions handle={profile.username} space={qaSpace} theme={t} prefs={prefs} />}
         {profile.username && !profile.blocks.some(b => b.kind === "event_list") && <ProfileEventList handle={profile.username} space={free ? "alias" : "root"} style={styleFor("event_list")} />}
         {profile.username && !profile.blocks.some(b => b.kind === "feedback") && <ProfileFeedback handle={profile.username} space={free ? "alias" : "root"} style={styleFor("feedback")} />}
 

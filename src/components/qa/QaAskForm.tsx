@@ -11,6 +11,8 @@ import { requestRewrite } from "@/lib/qa/rewrite-client";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { QaSpace } from "./useQaPublic";
+import { Button } from "@/components/ui/button";
+import type { CSSProperties as Style } from "react";
 
 /** Profile-theme colors when embedded on a hub; tokens otherwise. */
 export type QaTheme = { card: string; border: string; text: string; muted: string };
@@ -35,12 +37,14 @@ const WAND_ERRORS: Record<string, string> = {
  * state as everyone else — the server answers "ok" either way. The magic wand
  * rewrites the draft in place; the sender always reviews and sends it.
  */
-export function QaAskForm({ handle, space, headline, theme, size = "page" }: {
+export function QaAskForm({ handle, space, headline, theme, size = "page", designStyle, preview = false }: {
   handle: string;
   space: QaSpace;
   headline: string;
   theme?: QaTheme;
   size?: "page" | "hub";
+  designStyle?: Style;
+  preview?: boolean;
 }) {
   const { t, locale } = useI18n();
   const ask = useServerFn(askAnonymousQuestion);
@@ -48,6 +52,7 @@ export function QaAskForm({ handle, space, headline, theme, size = "page" }: {
     queryKey: ["qa-access", space, handle.toLowerCase()],
     queryFn: () => getQuestionAccess({ data: { handle, space } }),
     staleTime: 60_000,
+    enabled: !preview,
   });
   const [body, setBody] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
@@ -77,7 +82,7 @@ export function QaAskForm({ handle, space, headline, theme, size = "page" }: {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!body.trim() || phase === "sending" || phase === "rewriting") return;
+    if (preview || !body.trim() || phase === "sending" || phase === "rewriting") return;
     setError(null);
     setPhase("sending");
     try {
@@ -107,7 +112,7 @@ export function QaAskForm({ handle, space, headline, theme, size = "page" }: {
   const runWand = async () => {
     if (pointerRef.current !== "mouse") showTipBriefly();
     const draft = body.trim();
-    if (!draft || phase === "rewriting" || phase === "sending") {
+    if (preview || !draft || phase === "rewriting" || phase === "sending") {
       if (!draft) setError(t("pages.qa.ask.wandEmpty"));
       return;
     }
@@ -167,7 +172,7 @@ export function QaAskForm({ handle, space, headline, theme, size = "page" }: {
   const busy = phase === "sending" || rewriting;
   return (
     <form onSubmit={submit} className="w-full" aria-label={headline} aria-busy={busy}>
-      <div className={cn("overflow-hidden shadow-xl", big ? "rounded-[28px]" : "rounded-2xl", !theme && "bg-story-card text-story-ink")} style={card}>
+      <div className={cn("overflow-hidden shadow-xl", big ? "rounded-[28px]" : "rounded-2xl", !theme && "bg-story-card text-story-ink")} style={{ ...card, ...designStyle }}>
         <div className={cn("bg-gradient-to-br from-story-ring to-story-ring-2 text-story-card", big ? "px-6 pb-5 pt-6" : "px-4 pb-3 pt-4")}>
           <p className={cn("font-display leading-tight", big ? "text-3xl" : "text-xl")}>{headline}</p>
         </div>
@@ -256,15 +261,16 @@ export function QaAskForm({ handle, space, headline, theme, size = "page" }: {
       )}
       {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
 
-      <button
+      <Button
         type="submit"
-        disabled={busy || (!body.trim() && phase !== "sent")}
+        disabled={preview || busy || (!body.trim() && phase !== "sent")}
         className={cn(
           "mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full font-semibold transition-all duration-300 active:scale-[0.98] disabled:opacity-60",
           big ? "min-h-14 text-base" : "min-h-11 text-sm",
           phase === "sent" ? "bg-story-ring text-story-card" : "bg-foreground text-background",
         )}
         aria-live="polite"
+        style={designStyle}
       >
         {phase === "sent" ? (
           <><Check className="qa-sent-pop h-5 w-5" aria-hidden /> {t("pages.qa.ask.sent")}</>
@@ -273,7 +279,7 @@ export function QaAskForm({ handle, space, headline, theme, size = "page" }: {
         ) : (
           t("pages.qa.ask.send")
         )}
-      </button>
+      </Button>
       <p className={cn("mt-2 flex items-center justify-center gap-1.5 text-center text-xs", !theme && "text-muted-foreground")} style={muted}>
         <Lock className="h-3 w-3" aria-hidden /> {t("pages.qa.ask.anonymous")}
       </p>
