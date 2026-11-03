@@ -28,12 +28,13 @@ type Sock = {
 
 export async function sendViaSmtp(cfg: SmtpConfig, envelope: { from: string; to: string }, message: string): Promise<void> {
   const timeoutMs = cfg.timeoutMs ?? 4000;
-  const tls = await import("node:tls");
-  const net = await import("node:net");
   let socket: Sock | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let cancelled = false;
 
   const run = async () => {
+    const [tls, net] = await Promise.all([import("node:tls"), import("node:net")]);
+    if (cancelled) return;
     let buffer = "";
     let waiter: ((r: { code: number; text: string }) => void) | null = null;
     let failer: ((e: Error) => void) | null = null;
@@ -73,7 +74,8 @@ export async function sendViaSmtp(cfg: SmtpConfig, envelope: { from: string; to:
       return r;
     };
     const cmd = async (line: string, ok: number[], step: string) => {
-      socket!.write(line + "\r\n");
+      if (!socket) throw new SmtpError("SMTP connection unavailable", 421, true);
+      socket.write(line + "\r\n");
       return expect(ok, step);
     };
 
@@ -94,8 +96,10 @@ export async function sendViaSmtp(cfg: SmtpConfig, envelope: { from: string; to:
       plain.removeAllListeners("close");
       socket = await new Promise<Sock>((resolve, reject) => {
         const s = tls.connect({ socket: plain as never, servername: cfg.host }, () => resolve(s as unknown as Sock));
+        socket = s as unknown as Sock;
         s.once("error", reject);
       });
+      if (cancelled) { socket.destroy(); return; }
       attach(socket);
       ehlo = await cmd("EHLO rout.be", [250], "EHLO");
     }
@@ -117,6 +121,7 @@ export async function sendViaSmtp(cfg: SmtpConfig, envelope: { from: string; to:
       }),
     ]);
   } finally {
+    cancelled = true;
     if (timer) clearTimeout(timer);
     try { (socket as Sock | null)?.destroy(); } catch { /* already closed */ }
   }
