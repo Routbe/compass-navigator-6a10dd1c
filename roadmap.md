@@ -1,6 +1,10 @@
 # Repository import
 
 ## ROUT OS follow-up
+- [ ] Extend original story presence with animated avatar ring, portal/touch viewer and native file sharing; verify expiry and share payloads.
+- [ ] Add JSON-only 24-hour text/Q&A/Grid statuses, Studio composer and local pending drafts; enforce 280-character text/no arbitrary media.
+- [ ] Add procedural WebGL presence and three-second client video export with battery-safe cleanup and capability fallbacks.
+- [ ] Review and implement opt-in open-network broadcasting with sealed credentials, request-scoped dispatch and truthful delivery states.
 - [ ] Audit existing Q&A, About, Info and AI content; add linked, localized explanations that match verified anonymity, safety and optional rewrite behavior; verify public navigation and Q&A regression tests.
 - [x] Audit remaining Studio/Q&A regressions: serialize operations, preserve edits during discard, restore missing button controls/all twelve font choices, enforce default-off across helpers, apply glass/typography consistently; 119 focused tests passed.
 - [x] Review authentication/mail runtime constraints and verify public flows: request-scoped background mail hook, shared four-second transport budget, manifest/four icons return 200, no mobile overflow or runtime errors; actual ROUT session remains required.
