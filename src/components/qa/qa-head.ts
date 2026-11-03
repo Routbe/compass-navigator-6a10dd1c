@@ -8,7 +8,7 @@ export function qaAskHead(handle: string, space: QaSpace) {
     return out && out !== key ? out : fallback;
   };
   const title = tr("pages.qa.meta.title", `Stuur @${handle} een anoniem bericht`, { handle });
-  const description = tr("pages.qa.meta.description", "Stuur een 100% anoniem bericht of vraag. Geen account nodig, de ontvanger ziet nooit wie je bent.");
+  const description = tr("pages.qa.meta.description", "Stuur een vraag zonder je accountgegevens met de ontvanger te delen. Toegang hangt af van de gekozen doelgroep.");
   const path = `${space === "alias" ? "/u/" : "/"}${handle}/ask`;
   return {
     meta: [
