@@ -166,13 +166,13 @@ export function buildPostmarkPayload(input: {
   };
 }
 
-async function postToFallback(key: string, body: Record<string, unknown>, label: string, correlationId: string): Promise<{ sent: boolean; error?: string }> {
+async function postToFallback(key: string, body: Record<string, unknown>, label: string, correlationId: string, timeoutMs: number): Promise<{ sent: boolean; error?: string }> {
   try {
     const res = await fetch(process.env["FALLBACK_MAIL_API_URL"]?.trim() || FALLBACK_ENDPOINT, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json", "X-Postmark-Server-Token": key },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(SMTP_TIMEOUT_MS),
+      signal: AbortSignal.timeout(Math.max(1, timeoutMs)),
     });
     if (res.ok) {
       console.info(`[Mailer] ${label} sent via fallback`, { correlationId });
@@ -219,6 +219,8 @@ export function notifyAdminOfFallback(params: AdminAlertParams): void {
 }
 
 export async function sendMail(opts: MailOptions): Promise<{ sent: boolean; error?: string }> {
+  const deadline = Date.now() + SMTP_TIMEOUT_MS;
+  const remaining = () => Math.max(0, deadline - Date.now());
   if (opts.notificationUserId) {
     try {
       const { notificationMailPolicy } = await import("@/lib/email/unsubscribe.server");
@@ -261,13 +263,14 @@ export async function sendMail(opts: MailOptions): Promise<{ sent: boolean; erro
 
   let result: { sent: boolean; error?: string } = { sent: false, error: "Mail provider not configured." };
   let transient = true;
+  if (remaining() === 0) return { sent: false, error: "Mail delivery deadline exceeded." };
   if (brevoKey) {
     const payload = buildBrevoPayload({
       from: splitSender(sender), to: opts.to, replyTo: opts.replyTo ?? REPLY_TO, subject, html, text,
       messageId: newMessageId(), entityRefId: correlationId, tags: transactionalTags(opts.category, opts.tags),
       ...(opts.attachments ? { attachments: opts.attachments } : {}),
     });
-    const r = await sendViaBrevo(brevoKey, payload, 8000);
+    const r = await sendViaBrevo(brevoKey, payload, remaining());
     transient = r.transient;
     result = r.sent ? { sent: true } : { sent: false, error: r.error ?? "Brevo failed." };
     console[r.sent ? "info" : "error"](`[Mailer] ${label} ${r.sent ? "sent" : "failed"} via Brevo`, { correlationId, error: r.error });
@@ -286,7 +289,7 @@ export async function sendMail(opts: MailOptions): Promise<{ sent: boolean; erro
       ...(opts.attachments ? { attachments: opts.attachments.map((f) => ({ ...f, contentType: mimeFor(f.name) })) } : {}),
     });
     try {
-      await sendViaSmtp({ ...account, timeoutMs: SMTP_TIMEOUT_MS }, { from: account.user, to: opts.to }, message);
+      await sendViaSmtp({ ...account, timeoutMs: remaining() }, { from: account.user, to: opts.to }, message);
       console.info(`[Mailer] ${label} sent via Infomaniak SMTP`, { correlationId });
       result = { sent: true };
     } catch (error) {
@@ -296,7 +299,7 @@ export async function sendMail(opts: MailOptions): Promise<{ sent: boolean; erro
     }
   }
   // Fallback only on timeouts/network errors, never on a definitive refusal.
-  if (!result.sent && transient && fallbackKey) {
+  if (!result.sent && transient && fallbackKey && remaining() > 0) {
     const body = buildPostmarkPayload({
       to: opts.to, subject, html, text, correlationId,
       ...(opts.category ? { category: opts.category } : {}),
@@ -304,7 +307,7 @@ export async function sendMail(opts: MailOptions): Promise<{ sent: boolean; erro
       ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
       ...(opts.attachments ? { attachments: opts.attachments } : {}),
     });
-    result = await postToFallback(fallbackKey, body, label, correlationId);
+    result = await postToFallback(fallbackKey, body, label, correlationId, remaining());
   }
   if (!result.sent && !opts.skipAdminAlert) {
     notifyAdminOfFallback({ FAILED_TEMPLATE_ID: label, USED_FALLBACK_ID: fallbackKey ? "fallback-api" : "none", RECIPIENT_EMAIL: opts.to, REASON: `${result.error ?? "unknown"} [${correlationId}]` });

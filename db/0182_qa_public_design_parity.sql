@@ -26,6 +26,6 @@ begin
       from (select id,body,answer,prompt,answered_at,story_until from public.profile_questions
         where owner_id=o.owner_id and space=p_space and published and answer is not null
           and not is_quarantined order by answered_at desc limit 30) q), '[]'::jsonb)
+-- CREATE OR REPLACE retains existing execution grants; no role privileges change.
   );
 end $$;
--- CREATE OR REPLACE retains existing execution grants; no role privileges change.
