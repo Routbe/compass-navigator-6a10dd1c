@@ -14,10 +14,9 @@ it("never enables questions for a missing profile or missing opt-in", async () =
 });
 
 it("reads the alias opt-in independently of the root canvas", async () => {
-  vi.mocked(sql).mockImplementation(async (query) => {
-    const text = Array.isArray(query) ? query.join(" ") : String(query);
-    return [{ on: text.includes("public.alias_profiles") }];
-  });
+  vi.mocked(sql).mockResolvedValueOnce([{ on: false }]).mockResolvedValueOnce([{ on: true }]);
   expect(await questionsEnabled("owner", "root")).toBe(false);
   expect(await questionsEnabled("owner", "alias")).toBe(true);
+  const aliasQuery = vi.mocked(sql).mock.calls[1]?.[0].join(" ");
+  expect(aliasQuery).toContain("public.alias_profiles");
 });
