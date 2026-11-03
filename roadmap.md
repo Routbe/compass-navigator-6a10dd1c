@@ -1,6 +1,7 @@
 # Repository import
 
 ## ROUT OS follow-up
+- [ ] Audit existing Q&A, About, Info and AI content; add linked, localized explanations that match verified anonymity, safety and optional rewrite behavior; verify public navigation and Q&A regression tests.
 - [x] Audit remaining Studio/Q&A regressions: serialize operations, preserve edits during discard, restore missing button controls/all twelve font choices, enforce default-off across helpers, apply glass/typography consistently; 119 focused tests passed.
 - [x] Review authentication/mail runtime constraints and verify public flows: request-scoped background mail hook, shared four-second transport budget, manifest/four icons return 200, no mobile overflow or runtime errors; actual ROUT session remains required.
 - [x] Harden draft-only saves, onboarding drafts, discard baseline and workspace binding; PostgreSQL save/publish isolation test passed.
