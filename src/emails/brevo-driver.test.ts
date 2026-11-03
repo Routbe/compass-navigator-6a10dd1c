@@ -5,10 +5,10 @@ const base = { from: { name: "ROUT", email: "auth@rout.be" }, to: "a@b.be", repl
 
 describe("brevo driver", () => {
   afterEach(() => { delete process.env["MAIL_PROVIDER"]; });
-  it("defaults to brevo and switches to infomaniak", () => {
-    expect(mailProvider()).toBe("brevo");
-    process.env["MAIL_PROVIDER"] = "infomaniak";
+  it("defaults to Infomaniak and uses Brevo only when explicitly selected", () => {
     expect(mailProvider()).toBe("infomaniak");
+    process.env["MAIL_PROVIDER"] = "brevo";
+    expect(mailProvider()).toBe("brevo");
   });
   it("strips list headers and sets threading ids", () => {
     const p = buildBrevoPayload({ ...base, extraHeaders: { "List-Unsubscribe": "<x>", Precedence: "bulk", "X-Campaign": "1" } });

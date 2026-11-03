@@ -168,6 +168,7 @@ export interface ProfileDisplayPrefs {
   qaAudience: "public_unrestricted" | "members_only" | "verified_only";
   qaShowAvatar: boolean;
   qaShowProfileLink: boolean;
+  qaIntroSeen: boolean;
   guestbookEnabled: boolean;
   /** Steam live card on the profile (opt-in). */
   steamPresence: boolean;
@@ -278,6 +279,7 @@ export const DEFAULT_DISPLAY_PREFS: ProfileDisplayPrefs = {
   qaAudience: "members_only",
   qaShowAvatar: true,
   qaShowProfileLink: true,
+  qaIntroSeen: false,
   guestbookEnabled: false,
   steamPresence: false,
   lastfmPresence: false,
@@ -481,6 +483,7 @@ export function parseDisplayPrefs(raw: unknown): ProfileDisplayPrefs {
     qaAudience: oneOf(r["qaAudience"], ["public_unrestricted", "members_only", "verified_only"] as const, "members_only"),
     qaShowAvatar: r["qaShowAvatar"] !== false,
     qaShowProfileLink: r["qaShowProfileLink"] !== false,
+    qaIntroSeen: r["qaIntroSeen"] === true,
     guestbookEnabled: r["guestbookEnabled"] === true,
     steamPresence: r["steamPresence"] === true,
     lastfmPresence: r["lastfmPresence"] === true,

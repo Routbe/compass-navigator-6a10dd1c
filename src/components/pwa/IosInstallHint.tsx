@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Share, SquarePlus, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { shouldShowIosInstallHint } from "@/lib/in-app-browser";
+import { Button } from "@/components/ui/button";
 
 const DISMISS_KEY = "rout_ios_install_dismissed_at";
 const DWELL_MS = 25_000;
@@ -44,9 +45,9 @@ export function IosInstallHint() {
             <SquarePlus className="h-4 w-4 text-foreground" aria-hidden /> {t("pages.pwa.ios.add")}
           </p>
         </div>
-        <button type="button" onClick={close} aria-label={t("pages.pwa.ios.dismiss")} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" type="button" onClick={close} aria-label={t("pages.pwa.ios.dismiss")} className="shrink-0 rounded-full text-muted-foreground hover:text-foreground">
           <X className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { Copy, ExternalLink, X } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { isInAppBrowser, systemBrowserUrl } from "@/lib/in-app-browser";
+import { Button } from "@/components/ui/button";
 
 const DISMISS_KEY = "rout_inapp_banner_dismissed";
 
@@ -43,13 +44,13 @@ export function InAppBrowserBanner() {
             <ExternalLink className="h-3.5 w-3.5" /> {t("inAppBrowser.open")}
           </a>
         ) : (
-          <button type="button" onClick={() => void copy()} className="inline-flex shrink-0 items-center gap-1 rounded-full bg-background px-3 py-1.5 font-medium text-foreground">
+          <Button variant="ghost" size="sm" type="button" onClick={() => void copy()} className="shrink-0 gap-1 rounded-full bg-background font-medium text-foreground">
             <Copy className="h-3.5 w-3.5" /> {t("inAppBrowser.copy")}
-          </button>
+          </Button>
         )}
-        <button type="button" onClick={close} aria-label={t("inAppBrowser.dismiss")} className="shrink-0 rounded-full p-1 opacity-70 hover:opacity-100">
+        <Button variant="ghost" size="icon" type="button" onClick={close} aria-label={t("inAppBrowser.dismiss")} className="h-7 w-7 shrink-0 rounded-full p-1 opacity-70 hover:opacity-100">
           <X className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );
