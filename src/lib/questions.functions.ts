@@ -90,11 +90,11 @@ export const getMyQuestions = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const s = await import("./questions.server");
     try {
-      const [questions, enabled] = await Promise.all([s.myQuestions(context.userId, data.space), s.questionsEnabled(context.userId)]);
+      const [questions, enabled] = await Promise.all([s.myQuestions(context.userId, data.space), s.questionsEnabled(context.userId, data.space)]);
       return { ready: true, enabled, questions };
     } catch (e) {
       console.error("[questions] inbox failed", e instanceof Error ? e.message : e);
-      return { ready: false, enabled: true, questions: [] };
+      return { ready: false, enabled: false, questions: [] };
     }
   });
 
