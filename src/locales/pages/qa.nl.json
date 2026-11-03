@@ -119,5 +119,16 @@
   "pages.qa.mutes.lift": "Opheffen",
   "pages.qa.mutes.lifted": "Demping opgeheven. Nieuwe berichten van deze afzender komen weer binnen.",
   "pages.qa.loadFailed": "Laden lukte niet.",
-  "pages.qa.retry": "Opnieuw proberen"
+  "pages.qa.retry": "Opnieuw proberen",
+  "pages.qa.settings.audience": "Wie mag een vraag indienen?",
+  "pages.qa.settings.members": "Alleen ROUT-leden",
+  "pages.qa.settings.verified": "Alleen geverifieerde ROUT-leden",
+  "pages.qa.settings.everyone": "Iedereen — verhoogd risico op spam",
+  "pages.qa.ask.membersOnly": "Deze gebruiker accepteert alleen berichten van ingelogde ROUT-leden.",
+  "pages.qa.intro.title": "Anonieme vragen",
+  "pages.qa.intro.audience": "Je kiest wie vragen mag sturen. De ontvanger ziet nooit een afzendernaam.",
+  "pages.qa.intro.answers": "Beantwoord en publiceer in je inbox. Je avatar krijgt een groene statusring; antwoorden kun je delen als story.",
+  "pages.qa.intro.mute": "Demp via de drie puntjes permanent een afzender, zonder melding aan die persoon.",
+  "pages.qa.intro.publish": "Zet een aparte vragenpagina aan bij Instellingen. Opslaan bewaart je concept; Publiceren maakt het zichtbaar.",
+  "pages.qa.intro.done": "Begrepen"
 }

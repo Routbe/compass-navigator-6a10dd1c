@@ -119,5 +119,16 @@
   "pages.qa.mutes.lift": "Aufheben",
   "pages.qa.mutes.lifted": "Stummschaltung aufgehoben. Neue Nachrichten dieses Absenders kommen wieder an.",
   "pages.qa.loadFailed": "Laden fehlgeschlagen.",
-  "pages.qa.retry": "Erneut versuchen"
+  "pages.qa.retry": "Erneut versuchen",
+  "pages.qa.settings.audience": "Wer darf eine Frage senden?",
+  "pages.qa.settings.members": "Nur ROUT-Mitglieder",
+  "pages.qa.settings.verified": "Nur verifizierte ROUT-Mitglieder",
+  "pages.qa.settings.everyone": "Alle — höheres Spamrisiko",
+  "pages.qa.ask.membersOnly": "Dieses Mitglied akzeptiert nur Nachrichten von angemeldeten ROUT-Mitgliedern.",
+  "pages.qa.intro.title": "Anonyme Fragen",
+  "pages.qa.intro.audience": "Wähle, wer Fragen senden darf. Empfänger sehen niemals den Namen des Absenders.",
+  "pages.qa.intro.answers": "Beantworte und veröffentliche im Posteingang. Dein Avatar erhält einen grünen Statusring; teile Antworten als Story.",
+  "pages.qa.intro.mute": "Schalte einen Absender über die drei Punkte dauerhaft stumm, ohne Benachrichtigung.",
+  "pages.qa.intro.publish": "Aktiviere eine eigene Fragenseite in Einstellungen. Speichern behält den Entwurf; Veröffentlichen macht ihn sichtbar.",
+  "pages.qa.intro.done": "Verstanden"
 }
