@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import type { ProfileDisplayPrefs } from "@/lib/profile-display";
 import { StudioSectionIcon } from "./StudioSectionIcon";
 
-export type QaPrefs = Pick<ProfileDisplayPrefs, "questionsEnabled" | "qaPrompt" | "qaPromptCustom" | "qaOnHub" | "qaPage" | "qaAudience">;
+export type QaPrefs = Pick<ProfileDisplayPrefs, "questionsEnabled" | "qaPrompt" | "qaPromptCustom" | "qaOnHub" | "qaPage" | "qaAudience" | "qaIntroSeen">;
 
 /**
  * Studio: anonymous Q&A for one canvas — accept on/off, hub block and/or a
@@ -57,7 +57,7 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
         </span>
       </summary>
       <div className="space-y-3 py-3">
-        {row(t("pages.qa.settings.accepting"), t("pages.qa.settings.acceptingHelp"), prefs.questionsEnabled && prefs.qaOnHub, (v) => { if (v && !prefs.questionsEnabled) setIntroOpen(true); onPref("questionsEnabled", v || prefs.qaPage); onPref("qaOnHub", v); })}
+        {row(t("pages.qa.settings.accepting"), t("pages.qa.settings.acceptingHelp"), prefs.questionsEnabled && prefs.qaOnHub, (v) => { if (v && !prefs.qaIntroSeen) setIntroOpen(true); onPref("questionsEnabled", v || prefs.qaPage); onPref("qaOnHub", v); })}
         <label className="block space-y-2 text-sm">
           <span>{t("pages.qa.settings.audience")}</span>
           <Select value={prefs.qaAudience} onValueChange={(v) => onPref("qaAudience", v as QaPrefs["qaAudience"])}>
@@ -128,7 +128,7 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
             <p>{t("pages.qa.intro.mute")}</p>
             <p>{t("pages.qa.intro.publish")}</p>
           </div>
-          <Button onClick={() => setIntroOpen(false)}>{t("pages.qa.intro.done")}</Button>
+          <Button onClick={() => { onPref("qaIntroSeen", true); setIntroOpen(false); }}>{t("pages.qa.intro.done")}</Button>
         </DialogContent>
       </Dialog>
       {handle && (

@@ -7,17 +7,17 @@ import { qaDesign } from "@/lib/qa/design";
 import type { ProfileDisplayPrefs } from "@/lib/profile-display";
 
 /** Hub block: NGL-style anonymous message card plus the answered Q&As. */
-export function ProfileQuestions({ handle, space, theme, prefs }: { handle: string; space: QaSpace; theme: QaTheme; prefs?: ProfileDisplayPrefs }) {
+export function ProfileQuestions({ handle, space, theme, prefs, preview = false }: { handle: string; space: QaSpace; theme: QaTheme; prefs?: ProfileDisplayPrefs; preview?: boolean }) {
   const { t } = useI18n();
   const q = useQaPublic(handle, space);
   const qa = q.data;
-  if (!qa || !qa.accepting || !qa.onHub) return null;
-  const headline = promptHeadline(qa.promptKey, qa.promptCustom, t);
-  const answers = qa.answers.slice(0, 5);
+  if (!preview && (!qa || !qa.accepting || !qa.onHub)) return null;
+  const headline = promptHeadline(preview ? prefs?.qaPrompt : qa?.promptKey, preview ? prefs?.qaPromptCustom : qa?.promptCustom, t);
+  const answers = preview ? [] : qa?.answers.slice(0, 5) ?? [];
 
   return (
     <section id="qna" className="mt-4 w-full max-w-sm scroll-mt-6 text-left" aria-label={headline}>
-      <QaAskForm handle={handle} space={space} headline={headline} theme={theme} size="hub" designStyle={qaDesign(prefs, "questions", theme)} />
+      <QaAskForm handle={handle} space={space} headline={headline} theme={theme} size="hub" designStyle={qaDesign(prefs, "questions", theme)} preview={preview} />
       {answers.length > 0 && (
         <ul className="mt-3 space-y-2" style={{ color: theme.text }}>
           {answers.map((it) => (
@@ -28,7 +28,7 @@ export function ProfileQuestions({ handle, space, theme, prefs }: { handle: stri
           ))}
         </ul>
       )}
-      {qa.page && (
+      {qa?.page && !preview && (
         <a href={qaPaths(handle, space).ask} className="mt-2 inline-flex min-h-9 items-center gap-1.5 text-xs underline underline-offset-4" style={{ color: theme.muted }}>
           <MessageCircleQuestion className="h-3.5 w-3.5" aria-hidden /> {t("pages.qa.ask.answersTitle")} · {qa.answers.length}
         </a>

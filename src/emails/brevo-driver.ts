@@ -17,7 +17,7 @@ export const BREVO_TRACKING_OFF = {
 export type MailProvider = "brevo" | "infomaniak";
 
 export function mailProvider(): MailProvider {
-  return process.env["MAIL_PROVIDER"]?.trim().toLowerCase() === "infomaniak" ? "infomaniak" : "brevo";
+  return process.env["MAIL_PROVIDER"]?.trim().toLowerCase() === "brevo" ? "brevo" : "infomaniak";
 }
 
 export interface BrevoPayloadInput {
