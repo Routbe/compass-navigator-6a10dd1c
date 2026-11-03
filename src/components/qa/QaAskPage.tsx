@@ -8,7 +8,7 @@ import { QaAskForm } from "./QaAskForm";
 import { QaStoryRing } from "./QaStoryRing";
 import { qaPaths, useQaPublic, type QaSpace } from "./useQaPublic";
 import type { QaPublic } from "@/lib/qa/types";
-import { qaDesign } from "@/lib/qa/design";
+import { QA_PAGE_SURFACE, qaDesign } from "@/lib/qa/design";
 
 /** Full-screen, distraction-free anonymous message page (/u/<handle>/ask, /<handle>/ask). */
 export function QaAskPage({ handle, space, initial }: { handle: string; space: QaSpace; initial: QaPublic | null }) {
@@ -33,7 +33,7 @@ export function QaAskPage({ handle, space, initial }: { handle: string; space: Q
   const headline = promptHeadline(qa.promptKey, qa.promptCustom, t);
   let design: unknown = {};
   try { design = qa.designJson ? JSON.parse(qa.designJson) : {}; } catch { /* use default design */ }
-  const surface = { card: "var(--card)", border: "var(--border)", text: "var(--foreground)", muted: "var(--muted-foreground)" };
+  const surface = QA_PAGE_SURFACE;
 
   return (
     <main

@@ -172,7 +172,7 @@ export function ProfileThemePicker({
       >
         <div className="flex flex-wrap items-center gap-2" data-tour="studio-button-style"><AccordionTrigger className="min-w-0 flex-1 hover:no-underline"><span className="flex min-w-0 items-center gap-2 text-base font-medium"><StudioSectionIcon kind="typography" />Knoppen &amp; Typografie</span></AccordionTrigger><ThemeScopeSelect scope={scope} onChange={setScope} /></div>
         <AccordionContent className="space-y-4 pb-5">
-          <ScopedThemeBar prefs={prefs} setPref={setPref} scope={scope} />
+          <ScopedThemeBar prefs={prefs} setPref={setPref} scope={scope} showTypography={scope !== "all"} />
           {scope === "all" && <>
           <div className="flex min-w-0 items-center gap-2 pt-2">
             <p className="input-label flex items-center gap-1.5">Typografie <ProPill /></p>

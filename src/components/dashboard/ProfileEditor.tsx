@@ -134,6 +134,7 @@ import {
 } from "@/lib/studio-profile.functions";
 import { updateProfileLinks, updateProfileMeta, updateProfileTheme } from "@/lib/profile-draft.functions";
 import { diffStudioSnapshot, hasPatches, type StudioSnapshot } from "@/lib/profile-draft-patch";
+import { createDraftOperationLock } from "@/lib/profile-draft-state";
 import {
   checkAliasHandle,
   discardAliasDraft,
@@ -201,6 +202,8 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
   const saveLinks = useServerFn(updateProfileLinks);
   /** Last state the server confirmed; the next save sends only what differs. */
   const savedSnapshot = useRef<StudioSnapshot | null>(null);
+  const operationLock = useRef(createDraftOperationLock());
+  const latestSnapshot = useRef<StudioSnapshot | null>(null);
   const publishPersonal = useServerFn(alias ? publishAliasProfile : publishStudioProfile);
   const discardPersonal = useServerFn(alias ? discardAliasDraft : discardStudioDraft);
   const publishWorkspace = useServerFn(publishWorkspaceProfile);
@@ -617,8 +620,9 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
       savedSnapshot.current = currentSnapshot();
       return;
     }
-    editRev.current += 1;
-    setDirty(true);
+    const changed = hasPatches(diffStudioSnapshot(savedSnapshot.current, currentSnapshot()));
+    if (changed) editRev.current += 1;
+    setDirty(changed);
   }, [draft, loading]);
 
   // A newly added or removed component (video, link, widget) is saved without the usual pause.
@@ -676,6 +680,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
     prefs: prefs as unknown as Record<string, unknown>,
     blocks: blocks as unknown[],
   });
+  latestSnapshot.current = currentSnapshot();
 
   const save = async (silent = false) => {
     if (!user) return;
@@ -683,7 +688,9 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
       if (silent) return;
       return toast.error(handleProblem ?? `Choose a valid handle — ${handleRuleHint(handleCtx)}.`);
     }
+    if (!operationLock.current.acquire("save")) return;
     setSaving(true);
+    try {
     const rev = editRev.current;
     const next = currentSnapshot();
     const patches = diffStudioSnapshot(savedSnapshot.current, next);
@@ -698,11 +705,9 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
     } catch (e) {
       failCount.current += 1;
       setSaveError(classifySaveError(e instanceof Error && /fetch|network|load failed/i.test(e.message) ? "failed to fetch" : e));
-      setSaving(false);
       setRetryIn((n) => n + 1);
       return;
     }
-    setSaving(false);
     const failed = results.find((r) => !r.ok);
     // Sections that succeeded are confirmed even when another one failed.
     const base = savedSnapshot.current;
@@ -738,6 +743,10 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
     if (editRev.current === rev) setDirty(false);
     setSavedAt(Date.now());
     if (!silent) toast.success(t("studio.editor.saved"));
+    } finally {
+      operationLock.current.release();
+      setSaving(false);
+    }
   };
 
   const publish = async () => {
@@ -749,13 +758,14 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
       toast.info(t("studio.editor.noChanges"));
       return;
     }
+    if (!operationLock.current.acquire("publish")) return;
     setPublishing(true);
+    try {
     const result = await publishProfile({ data: { expectedRevision: draftRevision } }).catch((error) => ({
       ok: false as const,
       meta: null,
       reason: error instanceof Error ? error.message : "publish_failed",
     }));
-    setPublishing(false);
     if (!result.ok || !result.meta) {
       if (result.reason === "draft_conflict") {
         toast.error(t("studio.editor.conflict"));
@@ -769,6 +779,10 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
     void queryClient.invalidateQueries({ queryKey: ["public-profile", normalized] });
     void router.invalidate();
     toast.success(t("studio.editor.published"));
+    } finally {
+      operationLock.current.release();
+      setPublishing(false);
+    }
   };
 
   const applyPayload = (payload: Record<string, unknown>) => {
@@ -785,7 +799,10 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
 
   const discard = async () => {
     if (saving || publishing) return;
+    if (!operationLock.current.acquire("discard")) return;
+    const beforeDiscard = latestSnapshot.current;
     setDiscarding(true);
+    try {
     const result = (await discardDraft({ data: { expectedRevision: draftRevision } }).catch((error) => ({
       ok: false as const,
       payload: null,
@@ -797,12 +814,12 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
       meta: { draftRevision: number; publishedRevision: number } | null;
       reason: string | null;
     };
-    setDiscarding(false);
     if (!result.ok || !result.payload || !result.meta) {
       toast.error(result.reason === "draft_conflict" ? t("studio.editor.discardConflict") : t("studio.editor.discardFailed"));
       return;
     }
-    applyPayload(result.payload as Record<string, unknown>);
+    const editedDuringDiscard = beforeDiscard && latestSnapshot.current
+      ? hasPatches(diffStudioSnapshot(beforeDiscard, latestSnapshot.current)) : false;
     savedSnapshot.current = {
       username: String(result.payload["username"] ?? ""),
       displayName: result.payload["displayName"] as string | null,
@@ -816,9 +833,14 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
     };
     setDraftRevision(result.meta.draftRevision);
     setPublishedRevision(result.meta.publishedRevision);
-    setDirty(false);
+    if (!editedDuringDiscard) applyPayload(result.payload);
+    setDirty(editedDuringDiscard);
     setSaveError(null);
-    toast.success(t("studio.editor.restored"));
+    if (!editedDuringDiscard) toast.success(t("studio.editor.restored"));
+    } finally {
+      operationLock.current.release();
+      setDiscarding(false);
+    }
   };
 
   const addBlock = (kind: string, value = "") => {

@@ -12,6 +12,7 @@
 ## Source import architecture
 - Subdirectories have their own AGENTS.md rules; read them before changing files there.
 - Q&A audiences and public styling are published canvas preferences; account/parental restrictions can only tighten them. Why: Studio drafts must not alter live access or weaken child safety.
+- Studio save, discard and publish share a synchronous operation lock; discard restoration is compared with the confirmed snapshot and preserves edits made during its request. Why: simultaneous triggers and delayed responses must not overwrite newer local edits.
 - Preserve the imported ROUT TanStack Start routes, shared providers, design system, and feature modules rather than recreating the application from screenshots.
 - Keep managed Lovable integration files and project identifiers intact when importing source so the project retains its own Cloud connection.
 - The imported custom-session/PostgreSQL backend remains separate from Cloud Auth until explicitly migrated; never bypass its fail-closed runtime role or fabricate successful data-backed actions.

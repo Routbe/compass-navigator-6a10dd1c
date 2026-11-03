@@ -46,7 +46,7 @@ function toPublic(raw: unknown): QaPublic | null {
   if (!o || typeof o !== "object") return null;
   const answers = Array.isArray(o["answers"]) ? (o["answers"] as Row[]) : [];
   return {
-    accepting: o["accepting"] !== false,
+    accepting: o["accepting"] === true,
     onHub: o["onHub"] !== false,
     page: o["page"] === true,
     promptKey: str(o["promptKey"]),
@@ -127,9 +127,11 @@ export async function muteSenderByMessage(id: string): Promise<boolean> {
   return rows[0]?.["ok"] === true;
 }
 
-export async function questionsEnabled(ownerId: string): Promise<boolean> {
-  const rows = (await sql`select coalesce((display_prefs ->> 'questionsEnabled')::boolean, true) as on from public.profiles where id = ${ownerId}`) as Row[];
-  return rows[0]?.["on"] !== false;
+export async function questionsEnabled(ownerId: string, space: QaSpace | null = null): Promise<boolean> {
+  const rows = (space === "alias"
+    ? await sql`select coalesce((display_prefs ->> 'questionsEnabled')::boolean, false) as on from public.alias_profiles where user_id = ${ownerId} limit 1`
+    : await sql`select coalesce((display_prefs ->> 'questionsEnabled')::boolean, false) as on from public.profiles where id = ${ownerId} limit 1`) as Row[];
+  return rows[0]?.["on"] === true;
 }
 
 /** Owner toggle: off hides the block and the server refuses new questions. */

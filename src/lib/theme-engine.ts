@@ -30,7 +30,7 @@ export type GlassTargets = Record<"links" | "presence" | "board" | "booking", bo
 /** Button/typography keys a component may override (same values as the global design prefs). */
 export const OVERRIDE_BUTTON_VARIANTS = ["fill", "outline", "glass", "hard", "soft", "gradient", "neon", "ghost"] as const;
 export const OVERRIDE_BUTTON_RADII = ["pill", "xl", "rounded", "soft", "sharp"] as const;
-export const OVERRIDE_FONT_PAIRINGS = ["modern", "serif", "mono"] as const;
+export const OVERRIDE_FONT_PAIRINGS = ["modern", "serif", "mono", "display", "editorial", "geometric", "brutal", "luxe", "handwritten", "futuristic", "classic", "condensed"] as const;
 export type ButtonTokens = {
   buttonVariant: (typeof OVERRIDE_BUTTON_VARIANTS)[number];
   buttonRadius: (typeof OVERRIDE_BUTTON_RADII)[number];
