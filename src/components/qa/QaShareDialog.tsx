@@ -6,6 +6,7 @@ import { profileImageSrc } from "@/lib/image-proxy-rules";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { qaPaths, type QaSpace } from "./useQaPublic";
+import { shareStoryFile, storyFile, supportsStoryShare } from "@/lib/qa/native-share";
 
 export type QaShareTarget =
   | { kind: "prompt"; prompt: string }
@@ -53,15 +54,15 @@ export function QaShareDialog({ open, onOpenChange, target, handle, space, displ
     };
   }, [open, target, handle, displayName, avatarUrl, link, t]);
 
-  const file = blob ? new File([blob], fileName, { type: "image/png" }) : null;
-  const canShareFile = Boolean(file && typeof navigator !== "undefined" && navigator.canShare?.({ files: [file] }));
+  const file = blob ? storyFile(blob, fileName) : null;
+  const canShareFile = Boolean(file && supportsStoryShare(file));
 
   const share = async () => {
     if (!file) return;
     try {
-      await navigator.share({ files: [file], text: `${t("pages.qa.share.hint")} ${link}` });
+      await shareStoryFile(file);
     } catch {
-      /* the visitor closed the share sheet */
+      toast.error(t("pages.qa.share.failed"));
     }
   };
   const download = () => {
@@ -78,7 +79,6 @@ export function QaShareDialog({ open, onOpenChange, target, handle, space, displ
       toast.error(t("pages.qa.inbox.failed"));
     }
   };
-  const caption = encodeURIComponent(`${target?.kind === "prompt" ? target.prompt : t("pages.qa.share.hint")} ${link}`);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -103,13 +103,7 @@ export function QaShareDialog({ open, onOpenChange, target, handle, space, displ
           <Button variant={canShareFile ? "outline" : "default"} onClick={download} disabled={!url} className="gap-2">
             <Download className="h-4 w-4" aria-hidden />{t("pages.qa.share.download")}
           </Button>
-          <div className="grid grid-cols-3 gap-2">
-            <Button asChild variant="outline" size="sm">
-              <a href={`https://wa.me/?text=${caption}`} target="_blank" rel="noopener noreferrer">{t("pages.qa.share.whatsapp")}</a>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <a href={`https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer">{t("pages.qa.share.snapchat")}</a>
-            </Button>
+          <div className="grid gap-2">
             <Button variant="outline" size="sm" onClick={() => void copy()} className="gap-1"><Copy className="h-3.5 w-3.5" aria-hidden />{t("pages.qa.share.copy")}</Button>
           </div>
           <p className="text-xs text-muted-foreground">{t("pages.qa.share.howto")} <span className="break-all font-mono text-foreground">{link.replace(/^https?:\/\//, "")}</span></p>

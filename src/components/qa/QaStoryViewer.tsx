@@ -6,6 +6,9 @@ import { profileImageSrc } from "@/lib/image-proxy-rules";
 import { storedPromptLabel } from "@/lib/qa/prompts";
 import type { QaAnswer } from "@/lib/qa/story";
 import { qaPaths, type QaSpace } from "./useQaPublic";
+import { Button } from "@/components/ui/button";
+import { storyGesture } from "@/lib/qa/story-gestures";
+import { ProceduralStoryBackground } from "./ProceduralStoryBackground";
 
 const STORY_MS = 6500;
 
@@ -30,6 +33,9 @@ export function QaStoryViewer({ stories, handle, space, displayName, avatarUrl, 
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const closeRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const pointer = useRef<{ x: number; y: number } | null>(null);
+  const suppressTap = useRef(false);
   const story = stories[index];
   const avatar = profileImageSrc(avatarUrl);
   const name = displayName || `@${handle}`;
@@ -41,7 +47,9 @@ export function QaStoryViewer({ stories, handle, space, displayName, avatarUrl, 
   const prev = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
 
   useEffect(() => {
+    const focused = document.activeElement;
     closeRef.current?.focus();
+    return () => { if (focused instanceof HTMLElement && focused.isConnected) focused.focus(); };
   }, []);
 
   useEffect(() => {
@@ -51,6 +59,12 @@ export function QaStoryViewer({ stories, handle, space, displayName, avatarUrl, 
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "Tab") {
+        const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]),a[href]') ?? []);
+        const first = controls[0]; const last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prevOverflow; };
@@ -62,15 +76,24 @@ export function QaStoryViewer({ stories, handle, space, displayName, avatarUrl, 
   return createPortal(
     <div
       role="dialog"
+      ref={dialogRef}
       aria-modal="true"
       aria-label={t("pages.qa.story.open", { name })}
-      className="fixed inset-0 z-[110] flex select-none flex-col bg-gradient-to-b from-story-from to-story-to text-story-card"
+      className="fixed inset-0 z-[110] flex touch-none select-none flex-col overflow-hidden bg-story-viewport text-story-card"
       style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
-      onPointerDown={() => setPaused(true)}
-      onPointerUp={() => setPaused(false)}
-      onPointerCancel={() => setPaused(false)}
+      onPointerDown={(e) => { pointer.current = { x: e.clientX, y: e.clientY }; suppressTap.current = false; setPaused(true); }}
+      onPointerUp={(e) => {
+        setPaused(false);
+        const start = pointer.current; pointer.current = null;
+        if (!start) return;
+        const action = storyGesture(e.clientX - start.x, e.clientY - start.y);
+        suppressTap.current = action !== "tap";
+        if (action === "close") onClose();
+      }}
+      onPointerCancel={() => { pointer.current = null; setPaused(false); suppressTap.current = true; }}
     >
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-3">
+      <ProceduralStoryBackground paused={paused} />
+      <div className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-4 pt-3">
         <div className="flex gap-1" aria-hidden>
           {stories.map((s, i) => (
             <span key={s.id} className="h-[3px] flex-1 overflow-hidden rounded-full bg-story-card/30">
@@ -98,7 +121,7 @@ export function QaStoryViewer({ stories, handle, space, displayName, avatarUrl, 
             <p className="truncate text-sm font-semibold">{name}</p>
             <p className="text-xs opacity-70">{relativeTime(story.answeredAt, locale)}</p>
           </div>
-          <button
+          <Button variant="ghost" size="icon"
             ref={closeRef}
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
@@ -107,13 +130,13 @@ export function QaStoryViewer({ stories, handle, space, displayName, avatarUrl, 
             aria-label={t("pages.qa.story.close")}
           >
             <X className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
 
         <div className="relative flex flex-1 items-center justify-center py-6">
-          <button type="button" className="absolute inset-y-0 left-0 w-1/3" onClick={prev} aria-label={t("pages.qa.story.prev")} />
-          <button type="button" className="absolute inset-y-0 right-0 w-2/3" onClick={next} aria-label={t("pages.qa.story.next")} />
-          <article key={story.id} className="pointer-events-none w-full animate-in fade-in zoom-in-95 duration-300">
+          <Button variant="ghost" type="button" className="absolute inset-y-0 left-0 h-full w-1/3 rounded-none hover:bg-transparent" onClick={() => { if (!suppressTap.current) prev(); }} aria-label={t("pages.qa.story.prev")} />
+          <Button variant="ghost" type="button" className="absolute inset-y-0 right-0 h-full w-2/3 rounded-none hover:bg-transparent" onClick={() => { if (!suppressTap.current) next(); }} aria-label={t("pages.qa.story.next")} />
+          <article key={story.id} className="pointer-events-none max-h-full w-full overflow-y-auto animate-in fade-in zoom-in-95 duration-300">
             <div className="overflow-hidden rounded-[28px] bg-story-card text-story-ink shadow-2xl">
               <div className="bg-gradient-to-br from-story-ring to-story-ring-2 px-6 pb-6 pt-5 text-story-card">
                 <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest opacity-85">

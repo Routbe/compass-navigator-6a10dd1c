@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNo
 import { useI18n } from "@/lib/i18n";
 import { activeStories, hasUnseen, seenStorageKey } from "@/lib/qa/story";
 import { useQaPublic, type QaSpace } from "./useQaPublic";
+import { Button } from "@/components/ui/button";
 
 const QaStoryViewer = lazy(() => import("./QaStoryViewer").then((m) => ({ default: m.QaStoryViewer })));
 
@@ -28,8 +29,14 @@ export function QaStoryRing({ handle, space, displayName, avatarUrl, children }:
   // Browser-only state after hydration: current time and what this visitor watched.
   useEffect(() => {
     setNow(Date.now());
+    setSeenAt(null);
+    setOpen(false);
     if (!handle) return;
     try { setSeenAt(window.localStorage.getItem(seenStorageKey(space, handle))); } catch { /* storage blocked */ }
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    const refresh = () => setNow(Date.now());
+    document.addEventListener("visibilitychange", refresh);
+    return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", refresh); };
   }, [handle, space]);
 
   const close = useCallback(() => {
@@ -46,16 +53,16 @@ export function QaStoryRing({ handle, space, displayName, avatarUrl, children }:
 
   return (
     <>
-      <button
+      <Button variant="ghost"
         type="button"
         onClick={() => setOpen(true)}
-        className="qa-story-ring relative inline-flex rounded-full p-[3px] transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="qa-story-ring relative inline-flex h-auto rounded-full p-[3px] transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         data-seen={unseen ? "false" : "true"}
         aria-label={t("pages.qa.story.open", { name })}
         aria-haspopup="dialog"
       >
         <span className="inline-flex rounded-full bg-background p-[3px]">{children}</span>
-      </button>
+      </Button>
       {open && (
         <Suspense fallback={null}>
           <QaStoryViewer stories={stories} handle={handle} space={space} displayName={displayName} avatarUrl={avatarUrl} onClose={close} />
