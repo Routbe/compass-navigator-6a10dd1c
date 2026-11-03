@@ -1,0 +1,119 @@
+{
+  "source": "github",
+  "repository": "https://github.com/Routbe/compass-navigator-73781e3c.git",
+  "capabilities": [
+    {
+      "capability": "code",
+      "source": "Imported ROUT TanStack Start source",
+      "outcome": "preserve",
+      "status": "source_verified",
+      "next_action": "All application source, public assets, database reference scripts, and support scripts are present; original design retained."
+    },
+    {
+      "capability": "schema",
+      "source": "db/ custom PostgreSQL schema and migrations",
+      "outcome": "migrate",
+      "status": "pending",
+      "next_action": "Review custom roles, identity schemas, and ownership mapping before applying a compatible Cloud migration."
+    },
+    {
+      "capability": "records",
+      "source": "Original PostgreSQL application data",
+      "outcome": "migrate",
+      "status": "pending_export",
+      "next_action": "Provide per-table CSV or JSON exports; sanitize before import."
+    },
+    {
+      "capability": "auth identities",
+      "source": "Original custom cookie sessions and Better Auth identities",
+      "outcome": "migrate",
+      "status": "pending_export",
+      "next_action": "Provide original user IDs and email exports; preserve ownership and implement verified first-login password setup."
+    },
+    {
+      "capability": "authorization",
+      "source": "Original per-request PostgreSQL roles and RLS",
+      "outcome": "preserve_access_boundaries",
+      "status": "pending",
+      "next_action": "Adapt to verified mapped Cloud identities without bypassing existing fail-closed access checks."
+    },
+    {
+      "capability": "uploaded file bytes",
+      "source": "S3-compatible/Scaleway user uploads",
+      "outcome": "preserve",
+      "status": "pending_export_or_connection",
+      "next_action": "Reconnect the existing storage account and verify original object bytes separately from metadata."
+    },
+    {
+      "capability": "external providers",
+      "source": "Stripe, Bunq, email, storage, SMS and social integrations",
+      "outcome": "preserve",
+      "status": "code_imported_unverified",
+      "next_action": "Configure retained providers securely and verify each enabled production capability."
+    },
+    {
+      "capability": "public endpoints",
+      "source": "Original TanStack server routes",
+      "outcome": "preserve",
+      "status": "code_imported_unverified",
+      "next_action": "Verify external callers and access checks without redirecting traffic from the original application."
+    },
+    {
+      "capability": "callbacks",
+      "source": "Original OAuth and third-party callbacks",
+      "outcome": "preserve_non_auth_callbacks",
+      "status": "code_imported_unverified",
+      "next_action": "Migrate source-auth callbacks with account migration; review remaining callbacks before cutover."
+    },
+    {
+      "capability": "webhooks",
+      "source": "Original payments and provider webhook handlers",
+      "outcome": "preserve",
+      "status": "code_imported_unverified",
+      "next_action": "Verify retained signing secrets and dashboard endpoint configuration before cutover."
+    },
+    {
+      "capability": "schedules",
+      "source": "Original scheduler targets and cleanup code",
+      "outcome": "preserve",
+      "status": "pending_configuration",
+      "next_action": "Obtain existing schedule definitions and verify all required jobs without activating duplicates."
+    },
+    {
+      "capability": "secrets",
+      "source": "Original provider configuration",
+      "outcome": "secure_configuration",
+      "status": "missing",
+      "next_action": "Use secure provider connection or secret forms only when implementation is ready for verification; never request credentials in plain chat."
+    },
+    {
+      "capability": "cutover",
+      "source": "Original domains and provider destinations",
+      "outcome": "pending",
+      "status": "not_started",
+      "next_action": "Do not publish or change live domains until explicit user request and successful verification."
+    },
+    {
+      "capability": "verification",
+      "source": "Public preview and original hosted site",
+      "outcome": "verify",
+      "status": "public_flows_verified",
+      "next_action": "28 original tests passed, homepage/menu/commands verified on desktop and phone with no browser errors; build OK. Authenticated records and provider paths remain pending exports and secure configuration."
+    }
+  ],
+  "source_fidelity": {
+    "application_source_files": 2048,
+    "public_assets": 102,
+    "database_source_files": 180,
+    "support_scripts": 20,
+    "missing_application_files": 0,
+    "rendered_design_changes": 0,
+    "intentional_differences": [
+      "managed project metadata and credentials are not copied",
+      "generated lockfile retains installed dependencies",
+      "homepage omits unrelated sharing image",
+      "environment example values are blanked"
+    ],
+    "tests_passed": 28
+  }
+}
