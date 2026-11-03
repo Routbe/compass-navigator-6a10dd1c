@@ -20,7 +20,8 @@ import {
   OVERRIDE_BUTTON_VARIANTS,
   OVERRIDE_BUTTON_RADII,
 } from "@/lib/theme-engine";
-import { BUTTON_RADII, BUTTON_VARIANTS } from "@/lib/profile-design";
+import { BUTTON_EFFECTS, BUTTON_RADII, BUTTON_SIZES, BUTTON_VARIANTS, FONT_PAIRINGS } from "@/lib/profile-design";
+import { Switch } from "@/components/ui/switch";
 import {
   resolveComponentDesign,
 } from "@/lib/theme-engine";
@@ -60,11 +61,11 @@ const TARGETS: { id: keyof GlassTargets; label: string }[] = [
 ];
 
 /** Scoped theme bar + glass controls under "Knoppen & Typografie". */
-export function ThemeScopeSelect({ scope, onChange }: { scope: ThemeScope; onChange: (s: ThemeScope) => void }) {
-  return <Select value={scope} onValueChange={(v) => onChange(v as ThemeScope)}><SelectTrigger aria-label="Stijl toepassen op" className="h-8 w-40 text-xs"><SelectValue /></SelectTrigger><SelectContent>{SCOPES.map((s) => <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>)}</SelectContent></Select>;
+export function ThemeScopeSelect({ scope, onChange, allowedScopes }: { scope: ThemeScope; onChange: (s: ThemeScope) => void; allowedScopes?: readonly ThemeScope[] }) {
+  return <Select value={scope} onValueChange={(v) => onChange(v as ThemeScope)}><SelectTrigger aria-label="Stijl toepassen op" className="h-8 w-40 text-xs"><SelectValue /></SelectTrigger><SelectContent>{SCOPES.filter((s) => !allowedScopes || allowedScopes.includes(s.id)).map((s) => <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>)}</SelectContent></Select>;
 }
 
-export function ScopedThemeBar({ prefs, setPref, scope = "all" }: { prefs: ProfileDisplayPrefs; setPref: SetPref; scope?: ThemeScope }) {
+export function ScopedThemeBar({ prefs, setPref, scope = "all", showTypography = true }: { prefs: ProfileDisplayPrefs; setPref: SetPref; scope?: ThemeScope; showTypography?: boolean }) {
   const [custom, setCustom] = useState(false);
   const tokens = resolveScopedTokens(prefs, prefs.themeOverrides, scope);
   const unique = hasUniqueStyle(prefs, prefs.themeOverrides, scope);
@@ -98,25 +99,36 @@ export function ScopedThemeBar({ prefs, setPref, scope = "all" }: { prefs: Profi
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">Volgt standaard</span>
         ) : null}
       </div>
-      <ButtonControls design={design} patch={patch} custom={custom} onCustomize={() => setCustom((v) => !v)} />
+      <ButtonControls design={design} patch={patch} custom={custom} onCustomize={() => setCustom((v) => !v)} showTypography={showTypography} />
+      {scope === "all" && <div className="space-y-3 border-t border-border pt-3">
+        <label className="flex items-center justify-between gap-3 text-sm">Eigen knopstijl<Switch checked={prefs.buttonsCustom} onCheckedChange={(value) => setPref("buttonsCustom", value)} /></label>
+        {custom && <>
+          <div className="space-y-2"><p className="input-label">Linkweergave</p><div className="flex flex-wrap gap-2">{([ ["bar", "Lijn met naam"], ["icon", "Alleen icoon"] ] as const).map(([id, label]) => <Chip key={id} active={prefs.buttonShape === id} onClick={() => { setPref("buttonShape", id); setPref("buttonsCustom", true); }}>{label}</Chip>)}</div></div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-1 text-xs"><span className="input-label">Knopgrootte</span><Select value={prefs.buttonSize} onValueChange={(value) => { setPref("buttonSize", value as ProfileDisplayPrefs["buttonSize"]); setPref("buttonsCustom", true); }}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{BUTTON_SIZES.map((item) => <SelectItem key={item.id} value={item.id}>{item.label}</SelectItem>)}</SelectContent></Select></label>
+            <label className="space-y-1 text-xs"><span className="input-label">Beweging</span><Select value={prefs.buttonEffect} onValueChange={(value) => { setPref("buttonEffect", value as ProfileDisplayPrefs["buttonEffect"]); setPref("buttonsCustom", true); }}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{BUTTON_EFFECTS.map((item) => <SelectItem key={item.id} value={item.id}>{item.label}</SelectItem>)}</SelectContent></Select></label>
+          </div>
+        </>}
+      </div>}
 
       <p className="input-label">Glaseffect</p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {STYLES.map((s) => (
-          <button
+          <Button
+            variant="outline"
             key={s.id}
             type="button"
             role="radio"
             aria-checked={tokens.glassStyle === s.id}
             onClick={() => patch({ glassStyle: s.id })}
             className={cn(
-              "rounded-xl border p-2.5 text-left text-xs",
+              "h-auto flex-col items-start whitespace-normal rounded-xl border p-2.5 text-left text-xs",
               tokens.glassStyle === s.id ? "border-primary ring-1 ring-primary" : "border-border",
             )}
           >
             <span className="block font-medium">{s.label}</span>
             <span className="block text-muted-foreground">{s.hint}</span>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -139,7 +151,8 @@ export function ScopedThemeBar({ prefs, setPref, scope = "all" }: { prefs: Profi
             <p className="input-label">Randafwerking</p>
             <div className="flex gap-1.5">
               {BORDERS.map((b) => (
-                <button
+                <Button
+                  variant="outline"
                   key={b.id}
                   type="button"
                   aria-pressed={tokens.glassBorder === b.id}
@@ -150,7 +163,7 @@ export function ScopedThemeBar({ prefs, setPref, scope = "all" }: { prefs: Profi
                   )}
                 >
                   {b.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -177,22 +190,17 @@ export function ScopedThemeBar({ prefs, setPref, scope = "all" }: { prefs: Profi
   );
 }
 
-const FONTS: { id: "modern" | "serif" | "mono"; label: string }[] = [
-  { id: "modern", label: "Modern Sans" },
-  { id: "serif", label: "Klassiek Serif" },
-  { id: "mono", label: "Technisch Mono" },
-];
-
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
-    <button
+    <Button
+      variant="outline"
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={cn("rounded-full border px-3 py-1 text-xs", active ? "border-primary ring-1 ring-primary" : "border-border")}
+      className={cn("h-auto rounded-full border px-3 py-1 text-xs", active ? "border-primary ring-1 ring-primary" : "border-border")}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -202,11 +210,13 @@ function ButtonControls({
   patch,
   custom,
   onCustomize,
+  showTypography,
 }: {
   design: { buttonVariant: string; buttonRadius: string; fontPairing: string; buttonColor: string | null; buttonTextColor: string | null };
   patch: (p: ScopeOverride) => void;
   custom: boolean;
   onCustomize: () => void;
+  showTypography: boolean;
 }) {
   const variants = BUTTON_VARIANTS.filter((v) => (OVERRIDE_BUTTON_VARIANTS as readonly string[]).includes(v.id));
   const radii = BUTTON_RADII.filter((r) => (OVERRIDE_BUTTON_RADII as readonly string[]).includes(r.id));
@@ -236,16 +246,16 @@ function ButtonControls({
           ))}
         </div>
       </div>}
-      <div className="space-y-2">
+      {showTypography && <div className="space-y-2">
         <p className="input-label">Typografie</p>
         <div className="flex flex-wrap gap-1.5">
-          {FONTS.map((f) => (
-            <Chip key={f.id} active={design.fontPairing === f.id} onClick={() => patch({ fontPairing: f.id })}>
+          {FONT_PAIRINGS.map((f) => (
+            <Chip key={f.id} active={design.fontPairing === f.id} onClick={() => patch({ fontPairing: f.id as ScopeOverride["fontPairing"] })}>
               {f.label}
             </Chip>
           ))}
         </div>
-      </div>
+      </div>}
       <div className="space-y-2">
         <p className="input-label">Hoekafronding</p>
         <div className="flex flex-wrap gap-1.5">

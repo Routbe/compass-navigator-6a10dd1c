@@ -4,6 +4,12 @@ import { hasUniqueStyle, normalizeThemeOverrides, resolveComponentDesign } from 
 const global = { buttonVariant: "fill", buttonRadius: "rounded", fontPairing: "modern", buttonColor: null, buttonTextColor: null };
 
 describe("scoped theme cascade", () => {
+  it("preserves all twelve original typography choices in scoped designs", () => {
+    const fonts = ["modern", "serif", "mono", "display", "editorial", "geometric", "brutal", "luxe", "handwritten", "futuristic", "classic", "condensed"];
+    for (const fontPairing of fonts) {
+      expect(normalizeThemeOverrides({ answers: { fontPairing } }).answers?.fontPairing).toBe(fontPairing);
+    }
+  });
   it("styles anonymous forms and answers independently", () => {
     const overrides = normalizeThemeOverrides({ questions: { buttonRadius: "pill" }, answers: { fontPairing: "serif" } });
     expect(resolveComponentDesign(global, overrides, "questions").buttonRadius).toBe("pill");
