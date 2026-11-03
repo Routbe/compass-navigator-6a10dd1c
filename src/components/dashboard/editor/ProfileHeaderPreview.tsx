@@ -95,7 +95,7 @@ export function ProfileHeaderPreview({ previewDraft, free, publicPath }: Profile
                   {/* `zoom` (i.p.v. transform) schaalt óók de layouthoogte, zodat
                       het scrollen in het frame precies klopt. */}
                   <div style={{ width: PHONE_VIEWPORT, zoom: PHONE_SCALE }}>
-                    <ProfileView profile={previewDraft} free={free} publicPath={publicPath} />
+                    <ProfileView profile={previewDraft} free={free} publicPath={publicPath} preview />
                   </div>
                 </div>
               </div>
@@ -120,7 +120,7 @@ export function ProfileHeaderPreview({ previewDraft, free, publicPath }: Profile
                     className="h-[800px] w-[1280px] origin-top-left"
                     style={{ transform: `scale(${laptopScale})` }}
                   >
-                    <ProfileView profile={previewDraft} free={free} publicPath={publicPath} layout="wide" />
+                    <ProfileView profile={previewDraft} free={free} publicPath={publicPath} layout="wide" preview />
                   </div>
                   {/* Diagonale glasglans over het scherm */}
                   <div
@@ -164,7 +164,7 @@ export function ProfileHeaderPreview({ previewDraft, free, publicPath }: Profile
           )}
         </div>
         <p className="mt-3 text-center text-[11px] text-muted-foreground">
-          Wijzigingen zijn direct zichtbaar — opslaan maakt ze live.
+          Conceptvoorbeeld — alleen Publiceren maakt wijzigingen zichtbaar op je profiel.
         </p>
       </div>
     </aside>

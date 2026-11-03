@@ -130,11 +130,13 @@ export function ProfileView({
   free = false,
   layout = "auto",
   publicPath,
+  preview = false,
 }: {
   profile: ProfileRecord;
   free?: boolean;
   /** Explicit public path (e.g. "/w/<slug>" for a workspace); overrides the /u/ vs root guess. */
   publicPath?: string;
+  preview?: boolean;
   /** "wide" toont links in twee kolommen (desktopvoorbeeld / brede schermen). */
   layout?: "auto" | "wide";
 }) {
@@ -144,7 +146,7 @@ export function ProfileView({
   const sendClick = useServerFn(recordLinkClickFn);
   /** Anonieme klikmeting; faalt stil zodat een link altijd opent. */
   const trackClick = (blockId: string, label: string | null | undefined) => {
-    if (!profile.username) return;
+    if (preview || !profile.username) return;
     void sendClick({
       data: { handle: profile.username, blockId, label: label ?? null, space: free ? "alias" : "root" },
     }).catch(() => undefined);
@@ -480,7 +482,7 @@ export function ProfileView({
         <ProfilePassport handle={profile.username} theme={t} />
         {profile.username && <ConnectedApps handle={profile.username} />}
         {profile.username && prefs.guestbookEnabled && usesSectionFallback(profile.blocks, "widget:guestbook") && <ProfileGuestbook handle={profile.username} theme={t} />}
-        {profile.username && qaSpace && prefs.questionsEnabled && prefs.qaOnHub && <ProfileQuestions handle={profile.username} space={qaSpace} theme={t} prefs={prefs} />}
+        {profile.username && qaSpace && prefs.questionsEnabled && prefs.qaOnHub && <ProfileQuestions handle={profile.username} space={qaSpace} theme={t} prefs={prefs} preview={preview} />}
         {profile.username && !profile.blocks.some(b => b.kind === "event_list") && <ProfileEventList handle={profile.username} space={free ? "alias" : "root"} style={styleFor("event_list")} />}
         {profile.username && !profile.blocks.some(b => b.kind === "feedback") && <ProfileFeedback handle={profile.username} space={free ? "alias" : "root"} style={styleFor("feedback")} />}
 

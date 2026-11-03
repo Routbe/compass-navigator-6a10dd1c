@@ -2208,7 +2208,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
               <div className="relative overflow-hidden rounded-[2rem] bg-background">
                 <span className="absolute left-1/2 top-2 z-10 h-1.5 w-16 -translate-x-1/2 rounded-full bg-foreground/25" />
                 <div className="scrollbar-slim aspect-[9/19.5] overflow-y-auto text-foreground">
-                  <ProfileView profile={previewDraft} free={previewFree} publicPath={isWorkspace ? publicPath : undefined} />
+                  <ProfileView profile={previewDraft} free={previewFree} publicPath={isWorkspace ? publicPath : undefined} preview />
                 </div>
               </div>
             </div>
