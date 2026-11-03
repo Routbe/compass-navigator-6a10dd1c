@@ -307,6 +307,7 @@ textarea[data-tour^="cc-"] {
   --color-story-ink: hsl(var(--story-ink));
   --color-story-from: hsl(var(--story-bg-from));
   --color-story-to: hsl(var(--story-bg-to));
+  --color-story-viewport: #000;
   --color-highlight-foreground: hsl(var(--highlight-foreground));
   --color-terracotta: hsl(var(--terracotta));
   --color-terracotta-foreground: hsl(var(--terracotta-foreground));
@@ -1302,11 +1303,23 @@ select:focus-visible {
 
 /* Q&A status ring: conic sweep like a status/story ring; muted once watched. */
 .qa-story-ring {
+  isolation: isolate;
+  overflow: hidden;
+}
+.qa-story-ring::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  z-index: -1;
   background: conic-gradient(from 210deg, hsl(var(--story-ring)), hsl(var(--story-ring-2)), hsl(var(--story-ring)));
+  animation: qa-ring-turn 8s linear infinite;
 }
-.qa-story-ring[data-seen="true"] {
+.qa-story-ring[data-seen="true"]::before {
   background: hsl(var(--border));
+  animation: none;
 }
+@keyframes qa-ring-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .qa-story-ring::before { animation: none; } }
 @keyframes qa-story-progress {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
