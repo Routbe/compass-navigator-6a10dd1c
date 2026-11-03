@@ -4,6 +4,12 @@ import { hasUniqueStyle, normalizeThemeOverrides, resolveComponentDesign } from 
 const global = { buttonVariant: "fill", buttonRadius: "rounded", fontPairing: "modern", buttonColor: null, buttonTextColor: null };
 
 describe("scoped theme cascade", () => {
+  it("styles anonymous forms and answers independently", () => {
+    const overrides = normalizeThemeOverrides({ questions: { buttonRadius: "pill" }, answers: { fontPairing: "serif" } });
+    expect(resolveComponentDesign(global, overrides, "questions").buttonRadius).toBe("pill");
+    expect(resolveComponentDesign(global, overrides, "answers").buttonRadius).toBe("rounded");
+    expect(resolveComponentDesign(global, overrides, "answers").fontPairing).toBe("serif");
+  });
   it("falls back to global when a component has no override", () => {
     const d = resolveComponentDesign(global, {}, "booking");
     expect(d.buttonRadius).toBe("rounded");

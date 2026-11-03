@@ -165,6 +165,9 @@ export interface ProfileDisplayPrefs {
   qaOnHub: boolean;
   /** Dedicated /ask page. */
   qaPage: boolean;
+  qaAudience: "public_unrestricted" | "members_only" | "verified_only";
+  qaShowAvatar: boolean;
+  qaShowProfileLink: boolean;
   guestbookEnabled: boolean;
   /** Steam live card on the profile (opt-in). */
   steamPresence: boolean;
@@ -267,11 +270,14 @@ export const DEFAULT_DISPLAY_PREFS: ProfileDisplayPrefs = {
   publicProfile: true,
   contextToggle: false,
   timelineVisible: true,
-  questionsEnabled: true,
+  questionsEnabled: false,
   qaPrompt: "anything",
   qaPromptCustom: null,
   qaOnHub: true,
   qaPage: false,
+  qaAudience: "members_only",
+  qaShowAvatar: true,
+  qaShowProfileLink: true,
   guestbookEnabled: false,
   steamPresence: false,
   lastfmPresence: false,
@@ -467,11 +473,14 @@ export function parseDisplayPrefs(raw: unknown): ProfileDisplayPrefs {
     publicProfile: r["publicProfile"] === undefined ? true : Boolean(r["publicProfile"]),
     contextToggle: r["contextToggle"] === true,
     timelineVisible: r["timelineVisible"] === undefined ? true : Boolean(r["timelineVisible"]),
-    questionsEnabled: r["questionsEnabled"] !== false,
+    questionsEnabled: r["questionsEnabled"] === true,
     qaPrompt: resolvePromptKey(r["qaPrompt"]),
     qaPromptCustom: cleanCustomPrompt(r["qaPromptCustom"]),
     qaOnHub: r["qaOnHub"] !== false,
     qaPage: r["qaPage"] === true,
+    qaAudience: oneOf(r["qaAudience"], ["public_unrestricted", "members_only", "verified_only"] as const, "members_only"),
+    qaShowAvatar: r["qaShowAvatar"] !== false,
+    qaShowProfileLink: r["qaShowProfileLink"] !== false,
     guestbookEnabled: r["guestbookEnabled"] === true,
     steamPresence: r["steamPresence"] === true,
     lastfmPresence: r["lastfmPresence"] === true,

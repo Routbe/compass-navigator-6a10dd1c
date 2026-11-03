@@ -30,7 +30,8 @@ async function questionAccess(h: string, sp: "root" | "alias", userId: string | 
   const s = await import("./questions.server");
   const qa = await s.publicQa(h, sp).catch(() => null);
   const raw = qa?.qaLevel;
-  const level = !qa || !qa.accepting ? ("disabled" as const) : isQaLevel(raw) ? raw : ("public_unrestricted" as const);
+  const { stricterQaLevel } = await import("./minor-safety");
+  const level = !qa || !qa.accepting ? ("disabled" as const) : stricterQaLevel(isQaLevel(raw) ? raw : "public_unrestricted", qa.audience);
   let verified = false;
   if (userId && level === "verified_only") {
     const { sql } = await import("@/lib/neon");
