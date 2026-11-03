@@ -40,7 +40,7 @@
   "pages.qa.ask.wandTooMany": "Höchstens 3 Umschreibungen pro Minute. Versuche es gleich noch einmal.",
   "pages.qa.ask.wandFailed": "Umschreiben fehlgeschlagen. Dein Text ist unverändert.",
   "pages.qa.ask.wandEmpty": "Schreibe zuerst eine Nachricht zum Umschreiben.",
-  "pages.qa.ask.nudge": "Achtung: Unfreundliche Nachrichten kosten unsichtbar dein Senderecht.",
+  "pages.qa.ask.nudge": "Bleib respektvoll. Empfänger können dich stummschalten; wiederholte Stummschaltungen können dein Senderecht einschränken.",
   "pages.qa.ask.closed": "Dieses Profil nimmt gerade keine Nachrichten an.",
   "pages.qa.ask.restricted": "Dieses Mitglied nimmt nur Nachrichten von verifizierten ROUT-Konten an.",
   "pages.qa.ask.tooMany": "Langsam — versuch es in einer Minute noch einmal.",
@@ -112,7 +112,7 @@
   "pages.qa.meta.title": "Schick @{{handle}} eine anonyme Nachricht",
   "pages.qa.meta.description": "Stelle eine Frage, ohne deine Kontodaten mit dem Empfänger zu teilen. Der Zugang hängt von der gewählten Zielgruppe ab.",
   "pages.qa.mutes.title": "Stummgeschaltete Absender",
-  "pages.qa.mutes.help": "Jede Stummschaltung steht hier mit der Nachricht, die du stummgeschaltet hast. Wer sie geschickt hat, weiß niemand — auch du nicht. Nach dem Aufheben kommen neue Nachrichten wieder an und diese Nachricht kehrt in deinen Posteingang zurück.",
+  "pages.qa.mutes.help": "Jede Stummschaltung zeigt die Nachricht ohne Absenderdaten. Das Aufheben stellt diese Nachricht wieder her; globale Einschränkungen können weiterhin gelten.",
   "pages.qa.mutes.empty": "Du hast niemanden stummgeschaltet.",
   "pages.qa.mutes.since": "Stummgeschaltet am {{date}}",
   "pages.qa.mutes.noMessage": "Nachricht nicht mehr verfügbar",
@@ -130,5 +130,9 @@
   "pages.qa.intro.answers": "Beantworte und veröffentliche im Posteingang. Dein Avatar erhält einen grünen Statusring; teile Antworten als Story.",
   "pages.qa.intro.mute": "Schalte einen Absender über die drei Punkte dauerhaft stumm, ohne Benachrichtigung.",
   "pages.qa.intro.publish": "Aktiviere eine eigene Fragenseite in Einstellungen. Speichern behält den Entwurf; Veröffentlichen macht ihn sichtbar.",
-  "pages.qa.intro.done": "Verstanden"
+  "pages.qa.intro.done": "Verstanden",
+  "pages.qa.help.label": "Fragenratgeber",
+  "pages.qa.help.questions": "Über anonyme Fragen",
+  "pages.qa.help.privacy": "Anonymität und Sicherheit",
+  "pages.qa.help.ai": "KI und Ghost Mode"
 }

@@ -28,10 +28,10 @@ export function parseDoc(source: string, file: string): DocEntry {
 export const docs = Object.entries(sources).map(([file, source]) => parseDoc(source, file));
 export function getDoc(path: string) { return docs.find(d => d.path === path); }
 const articleOrder: Partial<Record<DocCategory, string[]>> = {
-  about: ["index", "manifesto", "ecosystem", "sovereignty", "open-source", "brand"],
-  info: ["index", "profiles", "usernames", "badges", "custom-badges", "credentials", "qr-studio", "wallet", "account-security", "account-merge"],
+  about: ["index", "manifesto", "anonymous-questions", "responsible-ai", "ecosystem", "sovereignty", "open-source", "brand"],
+  info: ["index", "profiles", "anonymous-questions", "answers-and-stories", "ghost-mode", "usernames", "badges", "custom-badges", "credentials", "qr-studio", "wallet", "account-security", "account-merge"],
   dev: ["index", "get-started", "identity-oidc", "identity", "credentials-api", "credentials", "webhooks", "ai-mcp", "design-system"],
-  safety: ["index", "architecture", "cryptography", "zero-knowledge", "compliance", "transparency", "privacy", "terms", "data-deletion", "security-advisories"],
+  safety: ["index", "anonymous-questions", "architecture", "cryptography", "zero-knowledge", "compliance", "transparency", "privacy", "terms", "data-deletion", "security-advisories"],
 };
 export function docsInCategory(category: DocCategory) {
   const rank = (doc: DocEntry) => { const slug = doc.path === `/${category}` ? "index" : doc.path.split("/").at(-1) ?? ""; const position = (articleOrder[category] ?? ["index"]).indexOf(slug); return position < 0 ? Number.MAX_SAFE_INTEGER : position; };

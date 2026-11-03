@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils";
 import type { QaSpace } from "./useQaPublic";
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import type { CSSProperties as Style } from "react";
 
 /** Profile-theme colors when embedded on a hub; tokens otherwise. */
@@ -95,7 +96,7 @@ export function QaAskForm({ handle, space, headline, theme, size = "page", desig
         if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.([10]);
       } else {
         setPhase("idle");
-        setError(t(ERRORS[result] ?? "pages.qa.ask.failed"));
+        setError(t(result === "restricted" && access.data?.level === "members_only" ? "pages.qa.ask.membersOnly" : ERRORS[result] ?? "pages.qa.ask.failed"));
       }
     } catch {
       setPhase("idle");
@@ -283,6 +284,11 @@ export function QaAskForm({ handle, space, headline, theme, size = "page", desig
       <p className={cn("mt-2 flex items-center justify-center gap-1.5 text-center text-xs", !theme && "text-muted-foreground")} style={muted}>
         <Lock className="h-3 w-3" aria-hidden /> {t("pages.qa.ask.anonymous")}
       </p>
+      {!preview && <nav aria-label={t("pages.qa.help.label")} className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs" style={muted}>
+        <Link to="/info/anonymous-questions" className="underline underline-offset-4">{t("pages.qa.help.questions")}</Link>
+        <Link to="/safety/anonymous-questions" className="underline underline-offset-4">{t("pages.qa.help.privacy")}</Link>
+        <Link to="/info/ghost-mode" className="underline underline-offset-4">{t("pages.qa.help.ai")}</Link>
+      </nav>}
     </form>
   );
 }

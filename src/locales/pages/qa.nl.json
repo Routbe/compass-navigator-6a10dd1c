@@ -40,7 +40,7 @@
   "pages.qa.ask.wandTooMany": "Maximaal 3 herschrijvingen per minuut. Probeer het zo opnieuw.",
   "pages.qa.ask.wandFailed": "Herschrijven lukte niet. Je tekst is onveranderd.",
   "pages.qa.ask.wandEmpty": "Schrijf eerst een bericht om te herschrijven.",
-  "pages.qa.ask.nudge": "Let op: onvriendelijke berichten leiden onzichtbaar tot verlies van verzendrechten.",
+  "pages.qa.ask.nudge": "Blijf respectvol. Ontvangers kunnen je dempen; herhaalde dempingen kunnen je verzendrechten beperken.",
   "pages.qa.ask.closed": "Dit profiel neemt nu geen berichten aan.",
   "pages.qa.ask.restricted": "Deze gebruiker stelt een geverifieerd ROUT-account verplicht om berichten te sturen.",
   "pages.qa.ask.tooMany": "Even rustig aan — probeer het over een minuutje opnieuw.",
@@ -112,7 +112,7 @@
   "pages.qa.meta.title": "Stuur @{{handle}} een anoniem bericht",
   "pages.qa.meta.description": "Stuur een vraag zonder je accountgegevens met de ontvanger te delen. Toegang hangt af van de gekozen doelgroep.",
   "pages.qa.mutes.title": "Gedempte afzenders",
-  "pages.qa.mutes.help": "Elke demping staat hier met het bericht dat je dempte. Wie de afzender is, weet niemand — ook jij niet. Na opheffen komen nieuwe berichten weer binnen en keert dit bericht terug in je inbox.",
+  "pages.qa.mutes.help": "Elke demping staat hier met het bericht dat je dempte, zonder afzendergegevens. Na opheffen keert dit bericht terug in je inbox; globale beperkingen kunnen blijven gelden.",
   "pages.qa.mutes.empty": "Je hebt niemand gedempt.",
   "pages.qa.mutes.since": "Gedempt op {{date}}",
   "pages.qa.mutes.noMessage": "Bericht niet meer beschikbaar",
@@ -130,5 +130,9 @@
   "pages.qa.intro.answers": "Beantwoord en publiceer in je inbox. Je avatar krijgt een groene statusring; antwoorden kun je delen als story.",
   "pages.qa.intro.mute": "Demp via de drie puntjes permanent een afzender, zonder melding aan die persoon.",
   "pages.qa.intro.publish": "Zet een aparte vragenpagina aan bij Instellingen. Opslaan bewaart je concept; Publiceren maakt het zichtbaar.",
-  "pages.qa.intro.done": "Begrepen"
+  "pages.qa.intro.done": "Begrepen",
+  "pages.qa.help.label": "Uitleg over vragen",
+  "pages.qa.help.questions": "Over anonieme vragen",
+  "pages.qa.help.privacy": "Anonimiteit & veiligheid",
+  "pages.qa.help.ai": "AI & Ghost Mode"
 }

@@ -31,7 +31,18 @@ Profiles are machine-readable: request https://rout.be/<handle> or https://rout.
 - [Press](https://rout.be/press): Press kit and brand assets.
 - [Contact](https://rout.be/contact): Questions, partnerships and bug reports.
 
-## Optional
+## Anonymous questions
+
+- [Anonymous questions on ROUT](https://rout.be/about/anonymous-questions): purpose and recipient control.
+- [Using anonymous questions](https://rout.be/info/anonymous-questions): opt-in, audiences and sending.
+- [Answers and stories](https://rout.be/info/answers-and-stories): explicit publication and shared copies.
+- [Ghost Mode](https://rout.be/info/ghost-mode): optional same-language rewriting, reviewed before sending.
+- [Anonymity and safety](https://rout.be/safety/anonymous-questions): recipient anonymity is not untraceability; technical abuse controls still process data.
+- [Responsible AI](https://rout.be/about/responsible-ai): external processing, fallback and human control.
+
+Public documentation grants no private inbox or sender access. Rewriting does not guarantee anonymity. A send confirmation is not proof of delivery or reading. Ghost Mode is not an agent permission to send or publish.
+
+## Policies
 
 - [Privacy](https://rout.be/privacy): Privacy policy.
 - [Terms](https://rout.be/terms): Terms of service.

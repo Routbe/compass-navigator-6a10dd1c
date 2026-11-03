@@ -40,7 +40,7 @@
   "pages.qa.ask.wandTooMany": "Up to 3 rewrites per minute. Try again shortly.",
   "pages.qa.ask.wandFailed": "Rewriting failed. Your text is unchanged.",
   "pages.qa.ask.wandEmpty": "Write a message first to rewrite it.",
-  "pages.qa.ask.nudge": "Heads up: unkind messages invisibly cost you your right to send.",
+  "pages.qa.ask.nudge": "Be respectful. Recipients can mute you; repeated mutes may restrict your sending rights.",
   "pages.qa.ask.closed": "This profile isn't taking messages right now.",
   "pages.qa.ask.restricted": "This member only accepts messages from verified ROUT accounts.",
   "pages.qa.ask.tooMany": "Easy there — try again in a minute.",
@@ -112,7 +112,7 @@
   "pages.qa.meta.title": "Send @{{handle}} an anonymous message",
   "pages.qa.meta.description": "Ask a question without sharing your account details with the recipient. Access depends on their chosen audience.",
   "pages.qa.mutes.title": "Muted senders",
-  "pages.qa.mutes.help": "Each mute is listed with the message you muted. Nobody knows who sent it — not even you. After lifting, new messages arrive again and this message returns to your inbox.",
+  "pages.qa.mutes.help": "Each mute is listed with its message, without sender details. Lifting restores this message to your inbox; global restrictions may still apply.",
   "pages.qa.mutes.empty": "You haven't muted anyone.",
   "pages.qa.mutes.since": "Muted on {{date}}",
   "pages.qa.mutes.noMessage": "Message no longer available",
@@ -130,5 +130,9 @@
   "pages.qa.intro.answers": "Answer and publish in your inbox. Your avatar gets a green status ring; answers can be shared as stories.",
   "pages.qa.intro.mute": "Permanently mute a sender using the three dots, without notifying them.",
   "pages.qa.intro.publish": "Enable a dedicated question page in Settings. Save keeps your draft; Publish makes it visible.",
-  "pages.qa.intro.done": "Got it"
+  "pages.qa.intro.done": "Got it",
+  "pages.qa.help.label": "Question guides",
+  "pages.qa.help.questions": "About anonymous questions",
+  "pages.qa.help.privacy": "Anonymity & safety",
+  "pages.qa.help.ai": "AI & Ghost Mode"
 }
