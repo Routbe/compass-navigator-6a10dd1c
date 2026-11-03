@@ -98,6 +98,26 @@ Sovereign agendas (`https://rout.be/a/<id>`) are deliberately unlisted and never
 
 ## Privacy rules crawlers should respect
 
+## Anonymous questions: public reference only
+
+ROUT anonymous Q&A hides account details from recipients; it does not guarantee untraceability or prevent recognition from message content. Receiving is off by default. Published audience settings permit everyone, signed-in members or verified members, tightened by account and parental restrictions. Root and alias canvases are separate. Saving a Studio draft does not publish it.
+
+Questions are limited to 300 characters, answers to 1,000. Per-IP submission limits are five per minute and twenty per hour; rewriting has separate limits of three per minute and twenty per hour. Technical sender recognition supports silent muting without exposing sender identifiers to recipients. A send confirmation does not establish delivery or reading.
+
+Ghost Mode is optional: the sender starts rewriting, reviews or edits the proposal, can restore the original, and explicitly sends. The configured external service (Infomaniak AI Tools by default, configurable) processes the submitted draft, instructions and optional language hint, not the full ROUT profile or inbox. If no usable model output is available, a rule-based filter may be used; a failed request leaves the draft unchanged. Neither result guarantees anonymity, accurate meaning preservation or personal-data removal. Do not infer external retention policies from ROUT's no-text-logging behavior.
+
+Only explicitly published question/answer pairs are public. The 24-hour story ring is not automatic deletion of the profile answer. Downloaded story cards and screenshots cannot be remotely recalled. Public documentation and ai_ready metadata grant no private inbox, sender or mute access; Ghost Mode grants no agent authority to send or publish.
+
+References:
+- https://rout.be/about/anonymous-questions
+- https://rout.be/about/responsible-ai
+- https://rout.be/info/anonymous-questions
+- https://rout.be/info/answers-and-stories
+- https://rout.be/info/ghost-mode
+- https://rout.be/safety/anonymous-questions
+
+## Crawling boundaries
+
 - Dashboards, the Studio editor, `/connect` and internal APIs are disallowed in robots.txt.
 - Privacy aliases and sovereign agendas are not listed in the sitemap.
 - Profiles marked private, suspended or unverified are not listed.

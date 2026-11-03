@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Source import architecture
+- Q&A explanations use the existing MDX catalog and DocPage routes across About, Info and Safety; AI discovery text links the same public articles without granting private access. Why: one navigable documentation source preserves original styling and keeps public knowledge distinct from permissions.
 - Subdirectories have their own AGENTS.md rules; read them before changing files there.
 - Q&A audiences and public styling are published canvas preferences; account/parental restrictions can only tighten them. Why: Studio drafts must not alter live access or weaken child safety.
 - Studio save, discard and publish share a synchronous operation lock; discard restoration is compared with the confirmed snapshot and preserves edits made during its request. Why: simultaneous triggers and delayed responses must not overwrite newer local edits.
