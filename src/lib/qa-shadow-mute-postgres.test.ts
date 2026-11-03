@@ -24,7 +24,7 @@ afterAll(async () => { await db.close(); });
 async function seed() {
   await db.exec("begin");
   await db.query("insert into public.users(id,email) values($1,'r@example.test'),($2,'a@example.test'),($3,'r2@example.test'),($4,'r3@example.test')", [R, A, R2, R3]);
-  await db.query("update public.profiles set username = case id when $1::uuid then 'recipient' when $2::uuid then 'sender' when $3::uuid then 'second' else 'third' end where id in ($1,$2,$3,$4)", [R, A, R2, R3]);
+  await db.query("update public.profiles set username = case id when $1::uuid then 'recipient' when $2::uuid then 'sender' when $3::uuid then 'second' else 'third' end, display_prefs = coalesce(display_prefs, '{}'::jsonb) || '{\"questionsEnabled\":true,\"qaAudience\":\"public_unrestricted\"}'::jsonb where id in ($1,$2,$3,$4)", [R, A, R2, R3]);
 }
 async function as(id: string | null) {
   await db.exec("reset role");
@@ -41,6 +41,33 @@ const trust = async (id: string) => {
   return (await db.query<{ trust_score: number; global_shadow_ban_starts_at: Date | null; global_shadow_ban_until: Date | null }>(
     "select trust_score, global_shadow_ban_starts_at, global_shadow_ban_until from public.users where id=$1", [id])).rows[0];
 };
+
+it("a draft save stays private until explicit publication", async () => {
+  try {
+    await seed();
+    await db.query("insert into public.profile_drafts(user_id,space,payload,revision,published_revision) values($1,'verified',$2::jsonb,1,1)", [R, JSON.stringify({ username: "recipient", displayName: "Live", displayPrefs: {} })]);
+    await db.query("update public.profiles set display_name='Live' where id=$1", [R]);
+    await as(R);
+    await db.query("select * from public.patch_profile_draft($1,'verified',$2::jsonb,'{}'::jsonb,'{}'::text[])", [R, JSON.stringify({ displayName: "Private draft" })]);
+    expect((await db.query<{ display_name: string }>("select display_name from public.profiles where id=$1", [R])).rows[0]?.display_name).toBe("Live");
+    expect((await db.query<{ name: string }>("select payload->>'displayName' as name from public.profile_drafts where user_id=$1 and space='verified'", [R])).rows[0]?.name).toBe("Private draft");
+    await db.query("select * from public.publish_profile_draft($1,'verified',2)", [R]);
+    expect((await db.query<{ display_name: string }>("select display_name from public.profiles where id=$1", [R])).rows[0]?.display_name).toBe("Private draft");
+  } finally { await db.exec("rollback"); }
+}, 30_000);
+
+it("the database rejects guests for a members-only canvas", async () => {
+  try {
+    await seed();
+    await db.query("update public.profiles set display_prefs=display_prefs || '{\"qaAudience\":\"members_only\"}'::jsonb where id=$1", [R]);
+    await as(null);
+    expect(await submit("recipient", "guest", KEY)).toBe("not_found");
+    await as(A);
+    expect(await submit("recipient", "member", KEY)).toBe("ok");
+    await as(R);
+    expect((await inbox()).rows.map((q) => q.body)).toEqual(["member"]);
+  } finally { await db.exec("rollback"); }
+}, 30_000);
 
 it("a muted sender still gets ok, but the message never reaches the inbox", async () => {
   try {
