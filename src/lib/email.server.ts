@@ -10,6 +10,7 @@
  * (de rest van de app roept enkel `sendLocalizedEmail` aan).
  */
 import { EMAIL_TEMPLATE_IDS, GLOBAL_FALLBACK_TEMPLATE_ID, type EmailCategory } from "@/emails/template-ids";
+import { registerBackgroundTask } from "./background-task.server";
 
 export const EMAIL_LOCALES = ["nl", "en", "fr", "de", "es", "it", "pt", "pl", "zh"] as const;
 export type EmailLocale = (typeof EMAIL_LOCALES)[number];
@@ -85,19 +86,6 @@ export function localeFromRequest(request?: Request | null): EmailLocale {
 }
 
 const cap = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) : "");
-
-type WaitUntil = (p: Promise<unknown>) => void;
-function vercelWaitUntil(): WaitUntil | null {
-  try {
-    const ctx = (globalThis as Record<symbol, unknown>)[Symbol.for("@vercel/request-context")] as
-      | { get?: () => { waitUntil?: WaitUntil } | undefined }
-      | undefined;
-    const fn = ctx?.get?.()?.waitUntil;
-    return typeof fn === "function" ? fn : null;
-  } catch {
-    return null;
-  }
-}
 
 export interface SendLocalizedEmailInput {
   to: string;
@@ -184,17 +172,10 @@ export async function sendLocalizedEmail(input: SendLocalizedEmailInput): Promis
   const { isAdminMode } = await import("@/lib/app-mode");
   if (isAdminMode()) {
     const sent = await task;
-    if (!sent) throw new Error("Inlogmail kon niet verzonden worden (zie [Brevo API Error] in de logs).");
+    if (!sent) throw new Error("Inlogmail kon niet verzonden worden. Probeer het later opnieuw.");
     return;
   }
-  const waitUntil = vercelWaitUntil();
-  if (waitUntil) {
-    try {
-      waitUntil(task);
-      return;
-    } catch {
-      /* val terug op begrensd afwachten */
-    }
-  }
-  await Promise.race([task, new Promise((resolve) => setTimeout(resolve, 5000))]);
+  if (registerBackgroundTask(task)) return;
+  // Without lifetime support, do not abandon the delivery when the request ends.
+  await task;
 }

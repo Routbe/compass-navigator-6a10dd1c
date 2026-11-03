@@ -59,13 +59,18 @@ export function buildBrevoPayload(input: BrevoPayloadInput): Record<string, unkn
 
 const BACKOFF_MS = [400, 1200];
 
-/** Up to 3 attempts on 408/429/5xx/network (as the original sender did); a 4xx refusal is final. */
+/** Retry transient failures only within one shared transport deadline. */
 export async function sendViaBrevo(key: string, payload: Record<string, unknown>, timeoutMs: number): Promise<{ sent: boolean; error?: string; transient: boolean }> {
+  const deadline = Date.now() + timeoutMs;
   let last: { sent: boolean; error?: string; transient: boolean } = { sent: false, error: "Brevo unreachable.", transient: true };
   for (let i = 0; i < 3; i++) {
-    last = await attempt(key, payload, timeoutMs);
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) return { sent: false, error: "Mail delivery deadline exceeded.", transient: true };
+    last = await attempt(key, payload, remaining);
     if (last.sent || !last.transient) return last;
-    if (i < 2) await new Promise((r) => setTimeout(r, BACKOFF_MS[i]));
+    const backoff = BACKOFF_MS[i] ?? 0;
+    if (i < 2 && backoff < deadline - Date.now()) await new Promise((r) => setTimeout(r, backoff));
+    else return last;
   }
   return last;
 }

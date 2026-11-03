@@ -69,6 +69,17 @@ it("the database rejects guests for a members-only canvas", async () => {
   } finally { await db.exec("rollback"); }
 }, 30_000);
 
+it("public Q&A includes only whitelisted published design preferences", async () => {
+  try {
+    await seed();
+    await db.query("update public.profiles set display_prefs=display_prefs || $2::jsonb where id=$1", [R, JSON.stringify({ typographyCustom: true, fontPairing: "editorial", glassStyle: "obsidian", glassBlur: 20, privateTestSetting: "never public" })]);
+    await as(null);
+    const result = await db.query<{ qa: { design: Record<string, unknown> } }>("select public.rout_qa_public('recipient','root') as qa");
+    expect(result.rows[0]?.qa.design).toMatchObject({ typographyCustom: true, fontPairing: "editorial", glassStyle: "obsidian", glassBlur: 20 });
+    expect(result.rows[0]?.qa.design).not.toHaveProperty("privateTestSetting");
+  } finally { await db.exec("rollback"); }
+}, 30_000);
+
 it("a muted sender still gets ok, but the message never reaches the inbox", async () => {
   try {
     await seed();

@@ -3,7 +3,7 @@ import { designButtonStyle, fontPairingOf } from "@/lib/profile-design";
 import { glassSurfaceStyle, resolveComponentDesign, type ComponentScope } from "@/lib/theme-engine";
 
 /** Shared by the dedicated-page editor and live page; hub themes remain separate. */
-export const QA_PAGE_SURFACE = { card: "var(--story-card)", border: "var(--border)", text: "var(--story-ink)", muted: "var(--muted-foreground)" };
+export const QA_PAGE_SURFACE = { card: "hsl(var(--story-card))", border: "var(--border)", text: "hsl(var(--story-ink))", muted: "var(--muted-foreground)" };
 
 export function qaDesign(raw: unknown, scope: ComponentScope, surface: { card: string; border: string; text: string; muted: string }) {
   const prefs = parseDisplayPrefs(raw);

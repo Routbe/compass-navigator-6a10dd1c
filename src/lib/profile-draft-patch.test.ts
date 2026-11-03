@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { draftJsonRecordSchema } from "./draft-json-schema";
 import {
   diffStudioSnapshot,
+  hasPatches,
   parsePatch,
   profileMetaPatchSchema,
   profileThemePatchSchema,
@@ -32,6 +33,11 @@ describe("draft JSON boundary", () => {
 });
 
 describe("atomic studio patches", () => {
+  it("restoring the confirmed published snapshot leaves no unsaved patches", () => {
+    const restored = { ...emptyAlias, displayName: "Published name" };
+    expect(hasPatches(diffStudioSnapshot(restored, { ...restored }))).toBe(false);
+    expect(hasPatches(diffStudioSnapshot(restored, { ...restored, displayName: "New local edit" }))).toBe(true);
+  });
   it("changing only the name sends only the name", () => {
     const patches = diffStudioSnapshot(emptyAlias, { ...emptyAlias, displayName: "Mijn alias" });
     expect(patches).toEqual({ meta: { displayName: "Mijn alias" }, theme: null, links: null });
