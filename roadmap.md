@@ -1,6 +1,8 @@
 # Repository import
 
 ## ROUT OS follow-up
+- [ ] Audit the remaining Studio/Q&A regressions and strengthen focused rule tests without changing the imported design.
+- [ ] Review authentication/mail runtime constraints and verify public flows; distinguish unavailable authenticated checks from completed checks.
 - [x] Harden draft-only saves, onboarding drafts, discard baseline and workspace binding; PostgreSQL save/publish isolation test passed.
 - [x] Add Q&A audience enforcement in Neon, questions off by default, separate-page editor/avatar/link controls, independent question/answer style scopes, first-use explanation and tour step.
 - [x] Verify manifest/icons, in-app banner, iOS installation hint and FSM tests; no offline worker added.
