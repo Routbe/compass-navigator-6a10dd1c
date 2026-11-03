@@ -163,7 +163,7 @@ export function QaAskForm({ handle, space, headline, theme, size = "page", desig
   if (locked) {
     return (
       <div role="status" className={cn("rounded-3xl p-5 text-sm", !theme && "border border-border bg-card text-muted-foreground")} style={card}>
-        <p style={muted}>{access.data?.level === "disabled" ? t("pages.qa.ask.closed") : t("pages.qa.ask.restricted")}</p>
+        <p style={muted}>{access.data?.level === "disabled" ? t("pages.qa.ask.closed") : t(access.data?.level === "members_only" ? "pages.qa.ask.membersOnly" : "pages.qa.ask.restricted")}</p>
       </div>
     );
   }

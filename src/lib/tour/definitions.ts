@@ -33,6 +33,7 @@ export const TOURS: Record<TourId, TourDef> = {
       { id: "pages", target: "studio-pages" },
       { id: "content", target: "studio-tab-links", advanceOn: { kind: "click" } },
       { id: "design", target: "studio-tab-design", advanceOn: { kind: "click" } },
+      { id: "buttonStyle", target: "studio-button-style" },
       { id: "publish", target: "studio-publish" },
     ],
   },

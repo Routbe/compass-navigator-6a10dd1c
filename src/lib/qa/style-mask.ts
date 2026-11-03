@@ -45,8 +45,8 @@ export const REWRITE_RATE = { limit: 3, windowSec: 60 } as const;
 export const REWRITE_RATE_HOURLY = { limit: 20, windowSec: 3600 } as const;
 
 /** Time budget per attempt: the main model first, then the fast fallback model. */
-export const REWRITE_PRIMARY_MS = 6000;
-export const REWRITE_FALLBACK_MS = 4000;
+export const REWRITE_PRIMARY_MS = 1200;
+export const REWRITE_FALLBACK_MS = 700;
 
 /** Infomaniak (Swiss) models; overridable with SOVEREIGN_AI_MODEL / SOVEREIGN_AI_FALLBACK_MODEL. */
 export const DEFAULT_SOVEREIGN_MODEL = "mistralai/Mistral-Small-4-119B-2603";

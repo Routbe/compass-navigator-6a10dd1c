@@ -10,7 +10,7 @@ export async function requestRewrite(text: string, uiLanguage?: string, signal?:
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, ui_language: uiLanguage }),
       credentials: "same-origin",
-      signal,
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(2000)]) : AbortSignal.timeout(2000),
     });
     if (res.status === 429) return { ok: false, reason: "too_many" };
     if (res.status === 400) return { ok: false, reason: "invalid" };

@@ -82,7 +82,8 @@ export async function applyTourDraftToUser(
 async function defaultDeps(): Promise<DraftApplyDeps> {
   const { sql } = await import("@/lib/neon");
   const { claimHandleFor } = await import("@/lib/claim.server");
-  const { writeStudioProfile } = await import("@/lib/studio-profile.server");
+  const { readStudioProfile } = await import("@/lib/studio-profile.server");
+  const { readOrCreateProfileDraft, patchProfileDraft } = await import("@/lib/profile-drafts.server");
   return {
     readAccount: async (userId) => {
       const rows = (await sql`
@@ -95,6 +96,22 @@ async function defaultDeps(): Promise<DraftApplyDeps> {
       };
     },
     claimHandle: (userId, handle) => claimHandleFor(userId, handle) as Promise<{ ok: boolean; handle?: string }>,
-    writeProfile: (userId, input) => writeStudioProfile(userId, input),
+    writeProfile: async (userId, input) => {
+      const live = await readStudioProfile(userId);
+      if (!live) throw new Error("profile_not_found");
+      await readOrCreateProfileDraft(userId, "verified", {
+        username: live.username ?? input.username,
+        displayName: live.displayName,
+        tagline: live.tagline,
+        avatarUrl: live.avatarUrl,
+        faviconUrl: live.faviconUrl,
+        theme: live.theme,
+        cardStyle: live.cardStyle,
+        blocks: live.blocks,
+        displayPrefs: live.displayPrefs,
+      });
+      const { displayPrefs, ...fields } = input;
+      return patchProfileDraft(userId, "verified", { fields, prefs: displayPrefs as Record<string, unknown> });
+    },
   };
 }

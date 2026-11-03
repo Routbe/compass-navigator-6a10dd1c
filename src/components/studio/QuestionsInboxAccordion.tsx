@@ -59,13 +59,13 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
       <div className="space-y-3 py-3">
         {row(t("pages.qa.settings.accepting"), t("pages.qa.settings.acceptingHelp"), prefs.questionsEnabled && prefs.qaOnHub, (v) => { if (v && !prefs.questionsEnabled) setIntroOpen(true); onPref("questionsEnabled", v || prefs.qaPage); onPref("qaOnHub", v); })}
         <label className="block space-y-2 text-sm">
-          <span>Wie mag een vraag indienen?</span>
+          <span>{t("pages.qa.settings.audience")}</span>
           <Select value={prefs.qaAudience} onValueChange={(v) => onPref("qaAudience", v as QaPrefs["qaAudience"])}>
-            <SelectTrigger aria-label="Wie mag een vraag indienen?"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label={t("pages.qa.settings.audience")}><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="members_only">Alleen ROUT-leden</SelectItem>
-              <SelectItem value="verified_only">Alleen geverifieerde ROUT-leden</SelectItem>
-              <SelectItem value="public_unrestricted">Iedereen — verhoogd risico op spam</SelectItem>
+              <SelectItem value="members_only">{t("pages.qa.settings.members")}</SelectItem>
+              <SelectItem value="verified_only">{t("pages.qa.settings.verified")}</SelectItem>
+              <SelectItem value="public_unrestricted">{t("pages.qa.settings.everyone")}</SelectItem>
             </SelectContent>
           </Select>
         </label>
@@ -121,14 +121,14 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
         <QaMutedList />
       </div>
       <Dialog open={introOpen} onOpenChange={setIntroOpen}>
-        <DialogContent><DialogHeader><DialogTitle>Anonieme vragen</DialogTitle></DialogHeader>
+        <DialogContent><DialogHeader><DialogTitle>{t("pages.qa.intro.title")}</DialogTitle></DialogHeader>
           <div className="space-y-3 text-sm text-muted-foreground">
-            <p>Je kiest wie vragen mag sturen. De ontvanger ziet nooit een afzendernaam.</p>
-            <p>Beantwoord een vraag in je inbox en publiceer het antwoord op je profiel. Je avatar krijgt een groene statusring; antwoorden kun je ook delen als story.</p>
-            <p>Via de drie puntjes demp je een afzender permanent, zonder melding aan die persoon.</p>
-            <p>Een afzonderlijke vragenpagina zet je aan bij Instellingen. Sla je wijzigingen op als concept en klik op Publiceren wanneer ze zichtbaar mogen worden.</p>
+            <p>{t("pages.qa.intro.audience")}</p>
+            <p>{t("pages.qa.intro.answers")}</p>
+            <p>{t("pages.qa.intro.mute")}</p>
+            <p>{t("pages.qa.intro.publish")}</p>
           </div>
-          <Button onClick={() => setIntroOpen(false)}>Begrepen</Button>
+          <Button onClick={() => setIntroOpen(false)}>{t("pages.qa.intro.done")}</Button>
         </DialogContent>
       </Dialog>
       {handle && (

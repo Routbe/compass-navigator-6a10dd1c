@@ -119,5 +119,16 @@
   "pages.qa.mutes.lift": "Lever",
   "pages.qa.mutes.lifted": "Masquage levé. Les nouveaux messages de cet expéditeur arriveront à nouveau.",
   "pages.qa.loadFailed": "Échec du chargement.",
-  "pages.qa.retry": "Réessayer"
+  "pages.qa.retry": "Réessayer",
+  "pages.qa.settings.audience": "Qui peut poser une question ?",
+  "pages.qa.settings.members": "Membres ROUT uniquement",
+  "pages.qa.settings.verified": "Membres ROUT vérifiés uniquement",
+  "pages.qa.settings.everyone": "Tout le monde — risque accru de spam",
+  "pages.qa.ask.membersOnly": "Ce membre accepte uniquement les messages de membres ROUT connectés.",
+  "pages.qa.intro.title": "Questions anonymes",
+  "pages.qa.intro.audience": "Choisissez qui peut envoyer des questions. Le destinataire ne voit jamais le nom de l’expéditeur.",
+  "pages.qa.intro.answers": "Répondez et publiez dans votre boîte. Votre avatar reçoit un cercle vert ; partagez les réponses en story.",
+  "pages.qa.intro.mute": "Masquez définitivement un expéditeur via les trois points, sans le prévenir.",
+  "pages.qa.intro.publish": "Activez une page dédiée dans les paramètres. Enregistrer garde le brouillon ; Publier le rend visible.",
+  "pages.qa.intro.done": "Compris"
 }

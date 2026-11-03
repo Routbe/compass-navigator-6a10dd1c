@@ -119,5 +119,16 @@
   "pages.qa.mutes.lift": "Lift",
   "pages.qa.mutes.lifted": "Mute lifted. New messages from this sender will arrive again.",
   "pages.qa.loadFailed": "Couldn't load.",
-  "pages.qa.retry": "Try again"
+  "pages.qa.retry": "Try again",
+  "pages.qa.settings.audience": "Who can send a question?",
+  "pages.qa.settings.members": "ROUT members only",
+  "pages.qa.settings.verified": "Verified ROUT members only",
+  "pages.qa.settings.everyone": "Everyone — higher spam risk",
+  "pages.qa.ask.membersOnly": "This member only accepts messages from signed-in ROUT members.",
+  "pages.qa.intro.title": "Anonymous questions",
+  "pages.qa.intro.audience": "Choose who can send questions. Recipients never see a sender name.",
+  "pages.qa.intro.answers": "Answer and publish in your inbox. Your avatar gets a green status ring; answers can be shared as stories.",
+  "pages.qa.intro.mute": "Permanently mute a sender using the three dots, without notifying them.",
+  "pages.qa.intro.publish": "Enable a dedicated question page in Settings. Save keeps your draft; Publish makes it visible.",
+  "pages.qa.intro.done": "Got it"
 }

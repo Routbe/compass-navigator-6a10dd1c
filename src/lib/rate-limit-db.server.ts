@@ -12,7 +12,7 @@ export async function sha256Hex(value: string): Promise<string> {
   return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export async function hitRateLimit(name: string, subject: string, rule: RateRule) {
+export async function hitRateLimit(name: string, subject: string, rule: RateRule, options: { failClosed?: boolean } = {}) {
   const now = Date.now();
   try {
     const bucket = `${name}:${await sha256Hex(subject)}`;
@@ -31,7 +31,7 @@ export async function hitRateLimit(name: string, subject: string, rule: RateRule
     return decideSlidingLimit(Number(rows[0]?.prev ?? 0), Number(rows[0]?.hits ?? 1), rule, now);
   } catch (error) {
     console.warn(`[rate-limit] ${name} skipped:`, (error as Error)?.message);
-    return { ok: true, retryAfter: 0 };
+    return options.failClosed ? { ok: false, retryAfter: rule.windowSec } : { ok: true, retryAfter: 0 };
   }
 }
 

@@ -72,8 +72,8 @@ export const askAnonymousQuestion = createServerFn({ method: "POST" })
     const { getRequest } = await import("@tanstack/react-start/server");
     const { clientIp, hitRateLimit } = await import("@/lib/rate-limit-db.server");
     const ip = clientIp(getRequest());
-    const minute = await hitRateLimit("question-ask", ip, QUESTION_RATE);
-    const hour = minute.ok ? await hitRateLimit("question-ask-hour", ip, QUESTION_RATE_HOURLY) : minute;
+    const minute = await hitRateLimit("question-ask", ip, QUESTION_RATE, { failClosed: true });
+    const hour = minute.ok ? await hitRateLimit("question-ask-hour", ip, QUESTION_RATE_HOURLY, { failClosed: true }) : minute;
     if (!minute.ok || !hour.ok) return { result: "too_many" as const, masked: false };
     const { normalizeText } = await import("./questions-rules");
     const body = normalizeText(data.body, QUESTION_MAX);

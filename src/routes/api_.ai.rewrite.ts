@@ -28,8 +28,8 @@ export const Route = createFileRoute("/api_/ai/rewrite")({
         const { clientIp, hitRateLimit } = await import("@/lib/rate-limit-db.server");
         const { tooManyRequests } = await import("@/lib/rate-limit-rules");
         const ip = clientIp(request);
-        const minute = await hitRateLimit("qa-rewrite", ip, REWRITE_RATE);
-        const hour = minute.ok ? await hitRateLimit("qa-rewrite-hour", ip, REWRITE_RATE_HOURLY) : minute;
+        const minute = await hitRateLimit("qa-rewrite", ip, REWRITE_RATE, { failClosed: true });
+        const hour = minute.ok ? await hitRateLimit("qa-rewrite-hour", ip, REWRITE_RATE_HOURLY, { failClosed: true }) : minute;
         if (!minute.ok || !hour.ok) return tooManyRequests(Math.max(minute.retryAfter, hour.retryAfter));
 
         const { maskWritingStyle } = await import("@/lib/qa/style-mask.server");
