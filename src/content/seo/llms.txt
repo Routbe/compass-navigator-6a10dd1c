@@ -31,8 +31,6 @@ Profiles are machine-readable: request https://rout.be/<handle> or https://rout.
 - [Press](https://rout.be/press): Press kit and brand assets.
 - [Contact](https://rout.be/contact): Questions, partnerships and bug reports.
 
-## Optional
-
 ## Anonymous questions
 
 - [Anonymous questions on ROUT](https://rout.be/about/anonymous-questions): purpose and recipient control.

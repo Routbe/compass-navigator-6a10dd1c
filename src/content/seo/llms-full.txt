@@ -96,8 +96,6 @@ Linked agenda (`https://rout.be/u/jona/agenda`):
 
 Sovereign agendas (`https://rout.be/a/<id>`) are deliberately unlisted and never reveal their owner.
 
-## Privacy rules crawlers should respect
-
 ## Anonymous questions: public reference only
 
 ROUT anonymous Q&A hides account details from recipients; it does not guarantee untraceability or prevent recognition from message content. Receiving is off by default. Published audience settings permit everyone, signed-in members or verified members, tightened by account and parental restrictions. Root and alias canvases are separate. Saving a Studio draft does not publish it.

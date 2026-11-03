@@ -40,7 +40,7 @@
   "pages.qa.ask.wandTooMany": "Maximum 3 réécritures par minute. Réessaie dans un instant.",
   "pages.qa.ask.wandFailed": "La réécriture a échoué. Ton texte n'a pas changé.",
   "pages.qa.ask.wandEmpty": "Écris d'abord un message à réécrire.",
-  "pages.qa.ask.nudge": "Attention : les messages méchants font perdre invisiblement le droit d'envoyer.",
+  "pages.qa.ask.nudge": "Reste respectueux. Les destinataires peuvent te masquer ; des masquages répétés peuvent limiter tes envois.",
   "pages.qa.ask.closed": "Ce profil n'accepte pas de messages pour le moment.",
   "pages.qa.ask.restricted": "Ce membre n'accepte que les messages de comptes ROUT vérifiés.",
   "pages.qa.ask.tooMany": "Doucement — réessaie dans une minute.",
@@ -112,7 +112,7 @@
   "pages.qa.meta.title": "Envoie un message anonyme à @{{handle}}",
   "pages.qa.meta.description": "Pose une question sans partager tes informations de compte avec le destinataire. L'accès dépend du public choisi.",
   "pages.qa.mutes.title": "Expéditeurs masqués",
-  "pages.qa.mutes.help": "Chaque masquage est listé avec le message que tu as masqué. Personne ne sait qui l'a envoyé — pas même toi. Après levée, les nouveaux messages arrivent à nouveau et ce message revient dans ta boîte.",
+  "pages.qa.mutes.help": "Chaque masquage indique le message, sans données de l'expéditeur. Le lever rétablit ce message ; des restrictions globales peuvent rester actives.",
   "pages.qa.mutes.empty": "Tu n'as masqué personne.",
   "pages.qa.mutes.since": "Masqué le {{date}}",
   "pages.qa.mutes.noMessage": "Message plus disponible",
@@ -130,5 +130,9 @@
   "pages.qa.intro.answers": "Répondez et publiez dans votre boîte. Votre avatar reçoit un cercle vert ; partagez les réponses en story.",
   "pages.qa.intro.mute": "Masquez définitivement un expéditeur via les trois points, sans le prévenir.",
   "pages.qa.intro.publish": "Activez une page dédiée dans les paramètres. Enregistrer garde le brouillon ; Publier le rend visible.",
-  "pages.qa.intro.done": "Compris"
+  "pages.qa.intro.done": "Compris",
+  "pages.qa.help.label": "Guides des questions",
+  "pages.qa.help.questions": "À propos des questions anonymes",
+  "pages.qa.help.privacy": "Anonymat et sécurité",
+  "pages.qa.help.ai": "IA et Ghost Mode"
 }
