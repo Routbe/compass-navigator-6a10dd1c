@@ -1,4 +1,6 @@
-import { ScopedThemeBar } from "@/components/dashboard/editor/ScopedThemeBar";
+import { useState } from "react";
+import { ScopedThemeBar, ThemeScopeSelect } from "@/components/dashboard/editor/ScopedThemeBar";
+import type { ThemeScope } from "@/lib/theme-engine";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -71,6 +73,7 @@ export function ProfileThemePicker({
   setPref,
   verified,
 }: ProfileThemePickerProps) {
+  const [scope, setScope] = useState<ThemeScope>("all");
   // AVATAR_FRAMES is currently unused directly here (delegated to AvatarFramePicker)
   // but kept imported for parity with legacy usage / future presets.
   void AVATAR_FRAMES;
@@ -167,37 +170,10 @@ export function ProfileThemePicker({
         value="buttons_typography"
         className="rounded-2xl border border-border bg-card px-4 sm:px-5"
       >
-        <AccordionTrigger className="hover:no-underline">
-          <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-            <span className="flex min-w-0 items-center gap-2 text-base font-medium"><StudioSectionIcon kind="typography" />Knoppen &amp; Typografie</span>
-            <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
-              {CARD_STYLES.find((c) => c.id === cardStyle)?.label ?? cardStyle}
-            </span>
-          </span>
-        </AccordionTrigger>
+        <div className="flex flex-wrap items-center gap-2" data-tour="studio-button-style"><AccordionTrigger className="min-w-0 flex-1 hover:no-underline"><span className="flex min-w-0 items-center gap-2 text-base font-medium"><StudioSectionIcon kind="typography" />Knoppen &amp; Typografie</span></AccordionTrigger><ThemeScopeSelect scope={scope} onChange={setScope} /></div>
         <AccordionContent className="space-y-4 pb-5">
-          <div className="flex min-w-0 items-center gap-2">
-            <p className="input-label">Knopvorm</p>
-            <CustomizeButton open={prefs.buttonsCustom} onToggle={() => setPref("buttonsCustom", !prefs.buttonsCustom)} label="Knoppen aanpassen" controls="buttons-advanced" />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {CARD_STYLES.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => onCardStyleChange(c.id)}
-                className={cn(
-                  "h-10 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
-                  cardStyle === c.id ? "border-primary/50 bg-primary/10" : "border-border",
-                )}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-          <div className="w-full">
-            <DesignButtonsTypographySection prefs={prefs} setPref={setPref} theme={theme} inlineControls section="buttons" />
-          </div>
+          <ScopedThemeBar prefs={prefs} setPref={setPref} scope={scope} />
+          {scope === "all" && <>
           <div className="flex min-w-0 items-center gap-2 pt-2">
             <p className="input-label flex items-center gap-1.5">Typografie <ProPill /></p>
             <CustomizeButton open={prefs.typographyCustom} onToggle={() => setPref("typographyCustom", !prefs.typographyCustom)} label="Typografie aanpassen" controls="type-advanced" />
@@ -220,6 +196,7 @@ export function ProfileThemePicker({
           <div className="w-full">
             <DesignButtonsTypographySection prefs={prefs} setPref={setPref} theme={theme} inlineControls section="typography" />
           </div>
+          </>}
           <div className="flex items-start justify-between gap-4 border-t border-border pt-4">
             <div className="min-w-0">
               <p className="text-sm font-medium">&ldquo;Made with ROUT&rdquo;-voetnoot</p>
@@ -235,9 +212,6 @@ export function ProfileThemePicker({
               checked={verified ? (prefs.showWatermark ?? false) : true}
               onCheckedChange={(v) => setPref("showWatermark", v)}
             />
-          </div>
-          <div className="border-t border-border pt-4">
-            <ScopedThemeBar prefs={prefs} setPref={setPref} />
           </div>
         </AccordionContent>
       </AccordionItem>
