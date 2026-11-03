@@ -6,8 +6,8 @@
       "capability": "code",
       "source": "Imported ROUT TanStack Start source",
       "outcome": "preserve",
-      "status": "imported",
-      "next_action": "Audit complete source fidelity and public route behavior."
+      "status": "source_verified",
+      "next_action": "All application source, public assets, database reference scripts, and support scripts are present; original design retained."
     },
     {
       "capability": "schema",
@@ -97,8 +97,8 @@
       "capability": "verification",
       "source": "Public preview and original hosted site",
       "outcome": "verify",
-      "status": "partial",
-      "next_action": "Public homepage/menu/commands and 14 tests passed previously; original hosted site requires Vercel access and authenticated flows lack original data and service configuration."
+      "status": "public_flows_verified",
+      "next_action": "28 original tests passed, homepage/menu/commands verified on desktop and phone with no browser errors; build OK. Authenticated records and provider paths remain pending exports and secure configuration."
     }
   ],
   "source_fidelity": {
@@ -113,6 +113,7 @@
       "generated lockfile retains installed dependencies",
       "homepage omits unrelated sharing image",
       "environment example values are blanked"
-    ]
+    ],
+    "tests_passed": 28
   }
 }
