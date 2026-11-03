@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, ShieldCheck, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
   const { t } = useI18n();
   const [shareOpen, setShareOpen] = useState(false);
   const [introOpen, setIntroOpen] = useState(false);
+  useEffect(() => { if (prefs.questionsEnabled && !prefs.qaIntroSeen) setIntroOpen(true); }, [prefs.questionsEnabled, prefs.qaIntroSeen]);
   const headline = promptHeadline(prefs.qaPrompt, prefs.qaPromptCustom, t);
   const paths = handle ? qaPaths(handle, space) : null;
   const keys: QaPromptKey[] = [...QA_PROMPT_KEYS, "custom"];
