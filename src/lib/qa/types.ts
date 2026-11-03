@@ -13,6 +13,6 @@ export type QaPublic = {
   audience: "public_unrestricted" | "members_only" | "verified_only";
   showAvatar: boolean;
   showProfileLink: boolean;
-  displayPrefs: Record<string, unknown>;
+  designJson: string | null;
   answers: QaAnswer[];
 };

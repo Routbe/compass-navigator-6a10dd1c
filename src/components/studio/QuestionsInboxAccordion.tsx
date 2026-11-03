@@ -3,6 +3,8 @@ import { ExternalLink, ShieldCheck, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QA_PROMPT_CUSTOM_MAX, QA_PROMPT_KEYS, promptHeadline, type QaPromptKey } from "@/lib/qa/prompts";
 import { QaInbox } from "@/components/qa/QaInbox";
 import { QaMutedList } from "@/components/qa/QaMutedList";
@@ -12,7 +14,7 @@ import { cn } from "@/lib/utils";
 import type { ProfileDisplayPrefs } from "@/lib/profile-display";
 import { StudioSectionIcon } from "./StudioSectionIcon";
 
-export type QaPrefs = Pick<ProfileDisplayPrefs, "questionsEnabled" | "qaPrompt" | "qaPromptCustom" | "qaOnHub" | "qaPage">;
+export type QaPrefs = Pick<ProfileDisplayPrefs, "questionsEnabled" | "qaPrompt" | "qaPromptCustom" | "qaOnHub" | "qaPage" | "qaAudience">;
 
 /**
  * Studio: anonymous Q&A for one canvas — accept on/off, hub block and/or a
@@ -29,6 +31,7 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
 }) {
   const { t } = useI18n();
   const [shareOpen, setShareOpen] = useState(false);
+  const [introOpen, setIntroOpen] = useState(false);
   const headline = promptHeadline(prefs.qaPrompt, prefs.qaPromptCustom, t);
   const paths = handle ? qaPaths(handle, space) : null;
   const keys: QaPromptKey[] = [...QA_PROMPT_KEYS, "custom"];
@@ -54,15 +57,18 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
         </span>
       </summary>
       <div className="space-y-3 py-3">
-        {row(t("pages.qa.settings.accepting"), t("pages.qa.settings.acceptingHelp"), prefs.questionsEnabled, (v) => onPref("questionsEnabled", v))}
-        {row(t("pages.qa.settings.onHub"), t("pages.qa.settings.onHubHelp"), prefs.qaOnHub, (v) => onPref("qaOnHub", v), !prefs.questionsEnabled)}
-        {row(
-          t("pages.qa.settings.page"),
-          t("pages.qa.settings.pageHelp", { path: paths ? `rout.be${paths.ask}` : "/ask" }),
-          prefs.qaPage,
-          (v) => onPref("qaPage", v),
-          !prefs.questionsEnabled,
-        )}
+        {row(t("pages.qa.settings.accepting"), t("pages.qa.settings.acceptingHelp"), prefs.questionsEnabled && prefs.qaOnHub, (v) => { if (v && !prefs.questionsEnabled) setIntroOpen(true); onPref("questionsEnabled", v || prefs.qaPage); onPref("qaOnHub", v); })}
+        <label className="block space-y-2 text-sm">
+          <span>Wie mag een vraag indienen?</span>
+          <Select value={prefs.qaAudience} onValueChange={(v) => onPref("qaAudience", v as QaPrefs["qaAudience"])}>
+            <SelectTrigger aria-label="Wie mag een vraag indienen?"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="members_only">Alleen ROUT-leden</SelectItem>
+              <SelectItem value="verified_only">Alleen geverifieerde ROUT-leden</SelectItem>
+              <SelectItem value="public_unrestricted">Iedereen — verhoogd risico op spam</SelectItem>
+            </SelectContent>
+          </Select>
+        </label>
 
         <fieldset className="space-y-2 rounded-xl border border-border p-3">
           <legend className="px-1 text-sm font-medium">{t("pages.qa.settings.prompt")}</legend>
@@ -114,6 +120,17 @@ export function QuestionsInboxAccordion({ space, handle, displayName, avatarUrl,
 
         <QaMutedList />
       </div>
+      <Dialog open={introOpen} onOpenChange={setIntroOpen}>
+        <DialogContent><DialogHeader><DialogTitle>Anonieme vragen</DialogTitle></DialogHeader>
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>Je kiest wie vragen mag sturen. De ontvanger ziet nooit een afzendernaam.</p>
+            <p>Beantwoord een vraag in je inbox en publiceer het antwoord op je profiel. Je avatar krijgt een groene statusring; antwoorden kun je ook delen als story.</p>
+            <p>Via de drie puntjes demp je een afzender permanent, zonder melding aan die persoon.</p>
+            <p>Een afzonderlijke vragenpagina zet je aan bij Instellingen. Sla je wijzigingen op als concept en klik op Publiceren wanneer ze zichtbaar mogen worden.</p>
+          </div>
+          <Button onClick={() => setIntroOpen(false)}>Begrepen</Button>
+        </DialogContent>
+      </Dialog>
       {handle && (
         <QaShareDialog
           open={shareOpen}
