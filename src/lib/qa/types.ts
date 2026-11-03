@@ -10,5 +10,9 @@ export type QaPublic = {
   displayName: string | null;
   avatarUrl: string | null;
   qaLevel: string | null;
+  audience: "public_unrestricted" | "members_only" | "verified_only";
+  showAvatar: boolean;
+  showProfileLink: boolean;
+  displayPrefs: Record<string, unknown>;
   answers: QaAnswer[];
 };

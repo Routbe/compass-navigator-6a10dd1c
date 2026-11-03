@@ -73,3 +73,8 @@ export function canSendQuestion(level: QaLevel, viewer: { signedIn: boolean; ver
 export function isQaLevel(v: unknown): v is QaLevel {
   return typeof v === "string" && (QA_LEVELS as readonly string[]).includes(v);
 }
+
+/** Canvas settings can tighten, never weaken, parental/account safety. */
+export function stricterQaLevel(account: QaLevel, canvas: QaLevel): QaLevel {
+  return QA_LEVELS[Math.min(QA_LEVELS.indexOf(account), QA_LEVELS.indexOf(canvas))] ?? "disabled";
+}

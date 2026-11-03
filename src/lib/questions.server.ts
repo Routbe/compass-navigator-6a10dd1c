@@ -54,6 +54,10 @@ function toPublic(raw: unknown): QaPublic | null {
     displayName: str(o["displayName"]),
     avatarUrl: str(o["avatarUrl"]),
     qaLevel: str(o["qaLevel"]),
+    audience: o["audience"] === "public_unrestricted" || o["audience"] === "verified_only" ? o["audience"] : "members_only",
+    showAvatar: o["showAvatar"] !== false,
+    showProfileLink: o["showProfileLink"] !== false,
+    displayPrefs: o["design"] && typeof o["design"] === "object" ? o["design"] as Record<string, unknown> : {},
     answers: answers.map((a) => ({
       id: String(a["id"]),
       body: String(a["body"] ?? ""),
@@ -130,8 +134,8 @@ export async function questionsEnabled(ownerId: string): Promise<boolean> {
 
 /** Owner toggle: off hides the block and the server refuses new questions. */
 export async function setQuestionsEnabled(ownerId: string, on: boolean): Promise<void> {
-  await sql`update public.profiles set display_prefs = coalesce(display_prefs, '{}'::jsonb) || jsonb_build_object('questionsEnabled', ${on}::boolean)
-     where id = ${ownerId}`;
+  const { patchProfileDraft } = await import("./profile-drafts.server");
+  await patchProfileDraft(ownerId, "verified", { prefs: { questionsEnabled: on } });
 }
 
 export type QaOwner = { handle: string; displayName: string | null; avatarUrl: string | null };

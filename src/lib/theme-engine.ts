@@ -6,10 +6,10 @@
  * merges global + override and turns the result into inline CSS.
  */
 
-export const THEME_SCOPES = ["all", "links", "booking", "board", "presence", "socials"] as const;
+export const THEME_SCOPES = ["all", "links", "booking", "board", "presence", "socials", "questions", "answers"] as const;
 export type ThemeScope = (typeof THEME_SCOPES)[number];
 export type ComponentScope = Exclude<ThemeScope, "all">;
-export const COMPONENT_SCOPES: ComponentScope[] = ["links", "booking", "board", "presence", "socials"];
+export const COMPONENT_SCOPES: ComponentScope[] = ["links", "booking", "board", "presence", "socials", "questions", "answers"];
 
 export const GLASS_STYLES = ["solid", "frosted-light", "frosted-dark", "obsidian", "prism"] as const;
 export type GlassStyle = (typeof GLASS_STYLES)[number];
@@ -181,6 +181,7 @@ export function resetScope(overrides: ThemeOverrides, scope: ComponentScope): Th
 
 /** Which glass target checkbox governs a scope (socials follow links). */
 function targetOf(scope: ComponentScope): keyof GlassTargets {
+  if (scope === "questions" || scope === "answers") return "board";
   return scope === "socials" ? "links" : scope;
 }
 
